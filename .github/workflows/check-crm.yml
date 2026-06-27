@@ -1,0 +1,19 @@
+name: Verificar CRM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Leer clientes del CRM
+        run: |
+          curl -s "https://webagency-bilbao-crm.netlify.app/api/clientes" | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          clientes = d if isinstance(d, list) else d.get('clientes', [])
+          print(f'Total clientes: {len(clientes)}')
+          for c in clientes:
+              print(f'  - {c.get(\"nombre\")} | {c.get(\"plan\")} | {c.get(\"zona\")}')
+          "
