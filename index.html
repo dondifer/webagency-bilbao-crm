@@ -80,16 +80,7 @@ tr:hover td{background:var(--bg2)}
 .atime{font-size:11px;color:var(--t2);margin-top:1px}
 .bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:5px}
 .fill{height:100%;border-radius:2px}
-/* CHAT */
-.aichat{display:flex;flex-direction:column;height:calc(100vh - 52px)}
-.msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:10px}
-.msg{max-width:82%;padding:9px 14px;border-radius:var(--rl);font-size:13px;line-height:1.65;white-space:pre-wrap}
-.msg.u{background:var(--acc);color:#fff;align-self:flex-end;border-radius:var(--rl) var(--rl) 4px var(--rl)}
-.msg.a{background:var(--bg1);border:0.5px solid var(--bd);align-self:flex-start;border-radius:4px var(--rl) var(--rl) var(--rl)}
-.msg.loading{color:var(--t2);font-style:italic;background:var(--bg2);border:none;align-self:flex-start}
-.msg.err-msg{background:var(--bred);color:var(--red);border-color:var(--red)}
-.ainput{border-top:0.5px solid var(--bd);padding:.9rem 1.2rem;display:flex;gap:8px;background:var(--bg1);flex-shrink:0}
-.ainput textarea{flex:1;border:0.5px solid var(--bd2);border-radius:var(--r);padding:8px 10px;font-size:13px;resize:none;font-family:inherit;outline:none;background:var(--bg2);color:var(--t1);min-height:38px;max-height:120px}
+/* fin estilos */
 .ainput textarea:focus{border-color:var(--acc)}
 .quick-btns{padding:.6rem 1.2rem;display:flex;gap:6px;flex-wrap:wrap;background:var(--bg2);border-bottom:0.5px solid var(--bd)}
 .qbtn{padding:4px 10px;border-radius:10px;border:0.5px solid var(--bd2);font-size:11px;cursor:pointer;background:var(--bg1);color:var(--t2);transition:.1s;font-family:inherit}
@@ -137,7 +128,6 @@ tr:hover td{background:var(--bg2)}
     <div class="nav" onclick="go('pipeline',this)"><i class="ti ti-git-fork"></i> Pipeline <span class="nav-badge" id="badge-leads">0</span></div>
     <div class="nav" onclick="go('clientes',this)"><i class="ti ti-users"></i> Clientes</div>
     <div class="nav" onclick="go('proyectos',this)"><i class="ti ti-file-text"></i> Proyectos</div>
-    <div class="nav" onclick="go('asistente',this)"><i class="ti ti-robot"></i> Asistente IA</div>
     <div class="nav" onclick="go('facturacion',this)"><i class="ti ti-coin"></i> Facturación</div>
     <div class="danger-zone">
       <div class="nav" onclick="cargarDemo()" style="color:#1D9E75"><i class="ti ti-database-import"></i> Cargar demo</div>
@@ -213,30 +203,6 @@ tr:hover td{background:var(--bg2)}
           <thead><tr><th>Proyecto</th><th>Cliente</th><th>Tipo</th><th>Estado</th><th>Precio</th><th>Entrega</th><th style="text-align:right">Acciones</th></tr></thead>
           <tbody id="proyectos-tbody"><tr><td colspan="7" class="empty">Cargando...</td></tr></tbody>
         </table></div></div>
-      </div>
-    </div>
-
-    <!-- ASISTENTE IA -->
-    <div id="pg-asistente" class="page">
-      <div class="topbar">
-        <h1>Asistente IA</h1>
-        <span id="ai-status" style="font-size:11px;color:var(--t2)">Conectando con Claude...</span>
-      </div>
-      <div class="aichat">
-        <div class="quick-btns">
-          <button class="qbtn" onclick="quickAsk('¿Cuánto MRR tengo este mes y cómo va respecto al objetivo?')">📊 Resumen MRR</button>
-          <button class="qbtn" onclick="quickAsk('¿Qué leads están en propuesta y qué debería hacer para cerrarlos?')">🎯 Cerrar leads</button>
-          <button class="qbtn" onclick="quickAsk('Redacta un email de seguimiento para el lead más reciente')">✉️ Email seguimiento</button>
-          <button class="qbtn" onclick="quickAsk('¿Qué proyectos tengo que entregar esta semana?')">📅 Entregas próximas</button>
-          <button class="qbtn" onclick="quickAsk('Dame argumentos de venta para un taller mecánico sin web en Basauri')">💬 Argumentos venta</button>
-        </div>
-        <div class="msgs" id="msgs">
-          <div class="msg a">Hola Diego 👋 Soy tu asistente con acceso a los datos reales de la agencia. Puedo ayudarte con propuestas, emails, análisis del pipeline y estrategia de ventas. ¿Qué necesitas?</div>
-        </div>
-        <div class="ainput">
-          <textarea id="inp" placeholder="Pregunta algo sobre tus clientes, leads o proyectos..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-          <button class="btn btnp" onclick="sendMsg()" style="height:38px;padding:0 14px;flex-shrink:0"><i class="ti ti-send"></i></button>
-        </div>
       </div>
     </div>
 
@@ -336,7 +302,6 @@ tr:hover td{background:var(--bg2)}
 <script>
 const API='https://webagency-bilbao-crm.netlify.app';
 let _clientes=[],_proyectos=[],_leads=[],_metricas={};
-let chatHistory=[];
 let dragId=null, dragEstado=null;
 
 // ── NAV ───────────────────────────────────────────────────────
@@ -648,80 +613,6 @@ async function eliminarRegistro(tipo){
   catch(e){toast('Error: '+e.message,false);}
 }
 
-// ── CHAT IA ───────────────────────────────────────────────────
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
-function quickAsk(txt){document.getElementById('inp').value=txt;sendMsg();}
-function addMsg(text,role){
-  const d=document.createElement('div');
-  d.className='msg '+role;d.textContent=text;
-  document.getElementById('msgs').appendChild(d);
-  d.scrollIntoView({block:'end'});return d;
-}
-
-async function sendMsg(){
-  const inp=document.getElementById('inp');
-  const text=inp.value.trim();if(!text)return;
-  inp.value='';inp.style.height='';
-  addMsg(text,'u');
-  chatHistory.push({role:'user',content:text});
-  const loading=addMsg('Pensando...','a loading');
-
-  // Contexto real inyectado en cada mensaje
-  const ctx=`=== DATOS REALES WebAgency Bilbao (${new Date().toLocaleDateString('es-ES')}) ===
-MRR: ${_metricas.mrr||0}€/mes | Clientes activos: ${_metricas.clientes_activos||0} | Proyectos en curso: ${_metricas.proyectos_en_curso||0} | Leads activos: ${_metricas.leads_activos||0} | Facturación mes: ${_metricas.facturacion_mes||0}€
-Pipeline: ${JSON.stringify(_metricas.pipeline||{})}
-CLIENTES: ${_clientes.map(c=>`${c.empresa} (${c.plan}, ${c.zona}, ${c.sector})`).join(' | ')||'ninguno'}
-PROYECTOS EN CURSO: ${_proyectos.filter(p=>p.estado==='en_curso').map(p=>`${p.nombre} → ${p.cliente}, entrega ${p.fecha_entrega?new Date(p.fecha_entrega).toLocaleDateString('es-ES'):'sin fecha'}`).join(' | ')||'ninguno'}
-LEADS: ${_leads.map(l=>`${l.empresa} [${l.estado}] ${l.zona} - ${l.producto_interes||''}`).join(' | ')||'ninguno'}`;
-
-  // Inyectamos el contexto solo en el primer mensaje del historial de sistema
-  const mensajes=[
-    {role:'user',content:`${ctx}\n\n---\n${text}`},
-    ...chatHistory.slice(1)
-  ];
-
-  try{
-    const res=await fetch('/api/claude',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1024,
-        system:`Eres el asistente interno de WebAgency Bilbao, la agencia de Diego Fernández Hernando que genera webs y CRMs con IA para negocios locales del Gran Bilbao (Bilbao, Getxo, Barakaldo, Basauri, Santurtzi, Erandio, Leioa, Galdakao). 
-
-Tienes acceso completo a los datos reales de la agencia que te llegan en cada mensaje.
-Responde SIEMPRE en español. Sé conciso, directo y práctico.
-Ayudas con: análisis del negocio, propuestas comerciales, emails a clientes y leads, argumentos de venta por sector, estrategia de captación, cálculo de precios y gestión operativa.
-Cuando redactes emails o propuestas, hazlos listos para copiar y enviar.`,
-        messages:mensajes
-      })
-    });
-
-    if(!res.ok){
-      const err=await res.json().catch(()=>({}));
-      throw new Error(err.error?.message||'HTTP '+res.status);
-    }
-
-    const data=await res.json();
-    const reply=data.content?.map(b=>b.text||'').join('')||'Sin respuesta';
-    loading.remove();
-    addMsg(reply,'a');
-    chatHistory.push({role:'user',content:text},{role:'assistant',content:reply});
-    // Mantener historial manejable
-    if(chatHistory.length>20)chatHistory=chatHistory.slice(-16);
-
-  }catch(err){
-    loading.remove();
-    const errMsg=addMsg('','a err-msg');
-    if(err.message.includes('401')||err.message.includes('403')){
-      errMsg.textContent='⚠️ Error de autenticación con Claude. Abre este archivo desde claude.ai o Claude Desktop para que la API key esté disponible automáticamente.';
-    } else {
-      errMsg.textContent='Error: '+err.message;
-    }
-  }
-}
-
 // ── HELPERS ───────────────────────────────────────────────────
 function timeAgo(d){
   const s=(new Date()-new Date(d))/1000;
@@ -734,16 +625,6 @@ function timeAgo(d){
 
 // ── INIT ──────────────────────────────────────────────────────
 (async()=>{
-  // Verificar conexión con Claude a través del proxy
-  try{
-    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1,messages:[{role:'user',content:'ping'}]})});
-    const ok=r.ok||r.status===400;
-    document.getElementById('ai-status').textContent=ok?'Claude conectado ✓':'Sin conexión con Claude';
-    document.getElementById('ai-status').style.color=ok?'#1D9E75':'#A32D2D';
-  }catch(e){
-    document.getElementById('ai-status').textContent='Error al conectar con Claude';
-    document.getElementById('ai-status').style.color='#BA7517';
-  }
   await loadAll();
   hideLoading();
   document.getElementById('approot').style.opacity='1';
