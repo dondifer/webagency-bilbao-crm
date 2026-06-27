@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Agente 2 · Generador de CRMs — WebAgency Bilbao</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--acc:#1D9E75;--acc2:#0F6E56;--bg1:#fff;--bg2:#f8f7f4;--bg3:#f1efe8;--t1:#1a1a18;--t2:#6b6a65;--bd:rgba(0,0,0,0.1);--bd2:rgba(0,0,0,0.18);--r:8px;--rl:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--t1);background:var(--bg3);height:100vh;display:flex;flex-direction:column}
+header{padding:.9rem 1.4rem;background:var(--bg1);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+header h1{font-size:15px;font-weight:600}
+header span{font-size:12px;color:var(--t2)}
+.wrap{flex:1;display:grid;grid-template-columns:380px 1fr;overflow:hidden}
+.panel{border-right:0.5px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow-y:auto}
+.panel-inner{padding:1.2rem;display:flex;flex-direction:column;gap:13px}
+.preview{background:var(--bg1);display:flex;flex-direction:column;overflow:hidden}
+.preview-bar{padding:.7rem 1rem;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
+.preview-bar span{font-size:12px;font-weight:500;color:var(--t2)}
+.preview-content{flex:1;overflow:auto;position:relative}
+iframe{width:100%;height:100%;border:none}
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--t2)}
+.placeholder i{font-size:48px;opacity:.3}
+.placeholder p{font-size:13px}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;color:var(--t2);font-weight:500}
+.field input,.field select,.field textarea{font-size:13px;padding:8px 10px;border-radius:var(--r);border:0.5px solid var(--bd2);background:var(--bg1);color:var(--t1);width:100%;font-family:inherit;outline:none}
+.field input:focus,.field select:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(29,158,117,.12)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);border:0.5px solid var(--bd2);background:transparent;cursor:pointer;font-size:13px;color:var(--t1);transition:.1s;font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btnp{background:var(--acc);color:#fff;border-color:var(--acc);width:100%;justify-content:center;padding:10px}
+.btnp:hover{background:var(--acc2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn i{font-size:15px}
+.modulos{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.modulo{padding:9px 10px;border:0.5px solid var(--bd2);border-radius:var(--r);cursor:pointer;transition:.1s;background:var(--bg1);display:flex;align-items:flex-start;gap:8px}
+.modulo:hover{border-color:var(--acc)}
+.modulo.on{border-color:var(--acc);background:#E1F5EE}
+.modulo i{font-size:16px;color:var(--t2);flex-shrink:0;margin-top:1px}
+.modulo.on i{color:var(--acc)}
+.mod-name{font-size:12px;font-weight:500}
+.mod-desc{font-size:10px;color:var(--t2);margin-top:1px}
+.log{background:var(--bg1);border:0.5px solid var(--bd);border-radius:var(--r);padding:.9rem;font-size:12px;line-height:1.7;color:var(--t2);min-height:80px;max-height:150px;overflow-y:auto;white-space:pre-wrap}
+.progress{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s}
+.divider{border:none;border-top:0.5px solid var(--bd);margin:2px 0}
+.actions{display:flex;gap:8px}
+.actions .btn{flex:1;justify-content:center;font-size:12px}
+.sector-preset{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.preset{padding:7px 8px;border:0.5px solid var(--bd2);border-radius:var(--r);cursor:pointer;text-align:center;font-size:11px;transition:.1s;background:var(--bg1)}
+.preset:hover{border-color:var(--acc);background:#E1F5EE}
+.preset span{font-size:16px;display:block;margin-bottom:2px}
+</style>
+</head>
+<body>
+<header>
+  <h1><i class="ti ti-database" style="font-size:16px;vertical-align:-2px;margin-right:6px;color:var(--acc)"></i>Agente 2 · Generador de CRMs</h1>
+  <span>WebAgency Bilbao · Powered by Claude</span>
+</header>
+<div class="wrap">
+  <div class="panel">
+    <div class="panel-inner">
+      <div class="section-title">Presets rápidos por sector</div>
+      <div class="sector-preset">
+        <div class="preset" onclick="loadPreset('restaurante')"><span>🍽️</span>Restaurante</div>
+        <div class="preset" onclick="loadPreset('clinica')"><span>🏥</span>Clínica</div>
+        <div class="preset" onclick="loadPreset('dental')"><span>🦷</span>Dental</div>
+        <div class="preset" onclick="loadPreset('taller')"><span>🔧</span>Taller</div>
+        <div class="preset" onclick="loadPreset('academia')"><span>📚</span>Academia</div>
+        <div class="preset" onclick="loadPreset('peluqueria')"><span>✂️</span>Peluquería</div>
+        <div class="preset" onclick="loadPreset('instalador')"><span>🔌</span>Instalador</div>
+        <div class="preset" onclick="loadPreset('hotel')"><span>🏡</span>Hotel rural</div>
+        <div class="preset" onclick="loadPreset('inmobiliaria')"><span>🏠</span>Inmobiliaria</div>
+      </div>
+
+      <hr class="divider">
+      <div class="section-title">Datos del cliente</div>
+
+      <div class="field">
+        <label>Nombre del negocio</label>
+        <input type="text" id="nombre" placeholder="Ej: Taller Mecánico Ugarte">
+      </div>
+      <div class="field">
+        <label>Sector</label>
+        <input type="text" id="sector" placeholder="Se rellena con el preset">
+      </div>
+      <div class="field">
+        <label>Nombre de la entidad principal</label>
+        <input type="text" id="entidad" placeholder="Ej: clientes, pacientes, alumnos, vehículos...">
+      </div>
+
+      <hr class="divider">
+      <div class="section-title">Módulos del CRM</div>
+      <div class="modulos" id="modulos"></div>
+
+      <hr class="divider">
+      <div class="section-title">Personalización</div>
+      <div class="field">
+        <label>Color del CRM</label>
+        <select id="colorcrm">
+          <option value="#534AB7">Índigo (profesional)</option>
+          <option value="#1D9E75">Verde esmeralda (salud)</option>
+          <option value="#1a56db">Azul (confianza)</option>
+          <option value="#d97706">Ámbar (calidez)</option>
+          <option value="#dc2626">Rojo (energía)</option>
+          <option value="#7c3aed">Violeta (premium)</option>
+          <option value="#1e293b">Negro (elegante)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Requisitos especiales</label>
+        <input type="text" id="extra" placeholder="Ej: campos adicionales, integraciones, idioma...">
+      </div>
+
+      <div class="log" id="log">Selecciona un preset de sector para configurar automáticamente los módulos, luego pulsa Generar.</div>
+      <div class="progress"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+
+      <button class="btn btnp" id="genbtn" onclick="generateCRM()">
+        <i class="ti ti-sparkles"></i> Generar CRM con IA
+      </button>
+      <div class="actions">
+        <button class="btn" id="copybtn" onclick="copyCode()" disabled><i class="ti ti-copy"></i> Copiar</button>
+        <button class="btn" id="dlbtn" onclick="downloadCRM()" disabled><i class="ti ti-download"></i> Descargar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview">
+    <div class="preview-bar">
+      <span id="preview-title">Vista previa del CRM</span>
+      <button class="btn" style="padding:4px 8px;font-size:11px" onclick="reloadPreview()"><i class="ti ti-refresh"></i> Recargar</button>
+    </div>
+    <div class="preview-content">
+      <div class="placeholder" id="placeholder">
+        <i class="ti ti-database"></i>
+        <p>El CRM generado aparecerá aquí</p>
+        <p style="font-size:11px">Selecciona un sector y pulsa Generar</p>
+      </div>
+      <iframe id="preview" style="display:none"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRESETS={
+  restaurante:{sector:'Restaurante / Bar',entidad:'clientes',modulos:['reservas','clientes','caja','carta','valoraciones','eventos']},
+  clinica:{sector:'Clínica / Fisioterapia',entidad:'pacientes',modulos:['pacientes','citas','historial','facturas','recordatorios','informes']},
+  dental:{sector:'Clínica Dental',entidad:'pacientes',modulos:['pacientes','citas','tratamientos','presupuestos','facturas','radiografias']},
+  taller:{sector:'Taller Mecánico',entidad:'vehículos',modulos:['vehiculos','clientes','ordenes','presupuestos','facturas','inventario']},
+  academia:{sector:'Academia / Clases',entidad:'alumnos',modulos:['alumnos','clases','horarios','pagos','asistencia','materiales']},
+  peluqueria:{sector:'Peluquería / Estética',entidad:'clientes',modulos:['clientes','citas','servicios','caja','fidelizacion','productos']},
+  instalador:{sector:'Instalador / Fontanero',entidad:'clientes',modulos:['clientes','trabajos','presupuestos','facturas','materiales','agenda']},
+  hotel:{sector:'Hotel Rural / Alojamiento',entidad:'huéspedes',modulos:['reservas','habitaciones','checkin','huespedes','facturacion','ocupacion']},
+  inmobiliaria:{sector:'Inmobiliaria',entidad:'clientes',modulos:['inmuebles','clientes','visitas','operaciones','documentos','informes']}
+};
+
+const ALL_MODULOS={
+  reservas:{icon:'ti-calendar',name:'Reservas',desc:'Gestión de reservas'},
+  clientes:{icon:'ti-users',name:'Clientes',desc:'Base de datos de clientes'},
+  caja:{icon:'ti-cash',name:'Caja diaria',desc:'Control de ingresos'},
+  carta:{icon:'ti-menu-2',name:'Carta digital',desc:'Menú y precios'},
+  valoraciones:{icon:'ti-star',name:'Valoraciones',desc:'Reseñas y feedback'},
+  eventos:{icon:'ti-calendar-event',name:'Eventos',desc:'Eventos y celebraciones'},
+  pacientes:{icon:'ti-user-heart',name:'Pacientes',desc:'Historial de pacientes'},
+  citas:{icon:'ti-clock',name:'Citas',desc:'Agenda de citas'},
+  historial:{icon:'ti-file-medical',name:'Historial',desc:'Historial clínico'},
+  facturas:{icon:'ti-receipt',name:'Facturas',desc:'Facturación'},
+  recordatorios:{icon:'ti-bell',name:'Recordatorios',desc:'Alertas automáticas'},
+  informes:{icon:'ti-chart-bar',name:'Informes',desc:'Estadísticas y KPIs'},
+  tratamientos:{icon:'ti-tooth',name:'Tratamientos',desc:'Plan de tratamiento'},
+  presupuestos:{icon:'ti-file-dollar',name:'Presupuestos',desc:'Gestión de presupuestos'},
+  radiografias:{icon:'ti-scan',name:'Radiografías',desc:'Archivos de imagen'},
+  vehiculos:{icon:'ti-car',name:'Vehículos',desc:'Ficha de vehículos'},
+  ordenes:{icon:'ti-tool',name:'Órdenes de trabajo',desc:'Gestión de reparaciones'},
+  inventario:{icon:'ti-package',name:'Inventario',desc:'Stock de repuestos'},
+  alumnos:{icon:'ti-school',name:'Alumnos',desc:'Matriculados activos'},
+  clases:{icon:'ti-chalkboard',name:'Clases',desc:'Horario de clases'},
+  horarios:{icon:'ti-calendar-time',name:'Horarios',desc:'Gestión de horarios'},
+  pagos:{icon:'ti-credit-card',name:'Pagos',desc:'Control de pagos'},
+  asistencia:{icon:'ti-checkbox',name:'Asistencia',desc:'Control de asistencia'},
+  materiales:{icon:'ti-books',name:'Materiales',desc:'Recursos y materiales'},
+  servicios:{icon:'ti-scissors',name:'Servicios',desc:'Catálogo de servicios'},
+  fidelizacion:{icon:'ti-heart',name:'Fidelización',desc:'Puntos y descuentos'},
+  productos:{icon:'ti-shopping-bag',name:'Productos',desc:'Stock de productos'},
+  trabajos:{icon:'ti-briefcase',name:'Trabajos',desc:'Órdenes de trabajo'},
+  agenda:{icon:'ti-calendar-check',name:'Agenda',desc:'Planificación de trabajos'},
+  reservas_h:{icon:'ti-bed',name:'Reservas',desc:'Reservas de habitaciones'},
+  habitaciones:{icon:'ti-door',name:'Habitaciones',desc:'Estado de habitaciones'},
+  checkin:{icon:'ti-key',name:'Check-in/out',desc:'Entrada y salida'},
+  huespedes:{icon:'ti-user-check',name:'Huéspedes',desc:'Ficha de huéspedes'},
+  facturacion:{icon:'ti-receipt-2',name:'Facturación',desc:'Cobros y facturas'},
+  ocupacion:{icon:'ti-chart-pie',name:'Ocupación',desc:'Dashboard de ocupación'},
+  inmuebles:{icon:'ti-building',name:'Inmuebles',desc:'Catálogo de propiedades'},
+  visitas:{icon:'ti-eye',name:'Visitas',desc:'Visitas concertadas'},
+  operaciones:{icon:'ti-handshake',name:'Operaciones',desc:'Ventas y alquileres'},
+  documentos:{icon:'ti-file-text',name:'Documentos',desc:'Contratos y documentos'},
+};
+
+let selectedModulos=[];
+let generatedHTML='';
+
+function loadPreset(sector){
+  const p=PRESETS[sector];
+  if(!p)return;
+  document.getElementById('sector').value=p.sector;
+  document.getElementById('entidad').value=p.entidad;
+  selectedModulos=[...p.modulos];
+  renderModulos(p.modulos);
+  setLog(`Preset "${p.sector}" cargado con ${p.modulos.length} módulos. Añade el nombre del negocio y genera.`, 0);
+}
+
+function renderModulos(active){
+  const c=document.getElementById('modulos');
+  c.innerHTML='';
+  active.forEach(id=>{
+    const m=ALL_MODULOS[id]||ALL_MODULOS[id+'s']||{icon:'ti-puzzle',name:id,desc:''};
+    const d=document.createElement('div');
+    d.className='modulo on';
+    d.dataset.id=id;
+    d.innerHTML=`<i class="ti ${m.icon}"></i><div><div class="mod-name">${m.name}</div><div class="mod-desc">${m.desc}</div></div>`;
+    d.onclick=()=>{d.classList.toggle('on');selectedModulos=Array.from(document.querySelectorAll('.modulo.on')).map(e=>e.dataset.id)};
+    c.appendChild(d);
+  });
+}
+
+function setLog(msg,p){
+  document.getElementById('log').textContent=msg;
+  document.getElementById('prog').style.width=(p||0)+'%';
+}
+
+async function generateCRM(){
+  const nombre=document.getElementById('nombre').value.trim();
+  const sector=document.getElementById('sector').value.trim();
+  const entidad=document.getElementById('entidad').value.trim();
+  const color=document.getElementById('colorcrm').value;
+  const extra=document.getElementById('extra').value.trim();
+  const mods=Array.from(document.querySelectorAll('.modulo.on')).map(e=>{
+    const id=e.dataset.id;
+    return ALL_MODULOS[id]?ALL_MODULOS[id].name:id;
+  });
+
+  if(!nombre||!sector||mods.length===0){setLog('⚠️ Rellena nombre, sector y selecciona al menos un módulo.',0);return;}
+
+  const btn=document.getElementById('genbtn');
+  btn.disabled=true;
+  setLog('Conectando con Claude...', 10);
+
+  const prompt=`Genera un CRM completo y funcional en HTML, CSS y JavaScript para el siguiente negocio.
+Devuelve SOLO el código HTML completo, sin explicaciones, sin markdown, sin texto antes o después. Empezar con <!DOCTYPE html>.
+
+NEGOCIO: ${nombre}
+SECTOR: ${sector}
+ENTIDAD PRINCIPAL: ${entidad}
+COLOR PRINCIPAL: ${color}
+MÓDULOS REQUERIDOS: ${mods.join(', ')}
+${extra?'REQUISITOS EXTRA: '+extra:''}
+
+ESPECIFICACIONES DEL CRM:
+1. HTML5 completo con CSS interno y JS vanilla (sin frameworks externos)
+2. Color principal ${color} en sidebar, botones y acentos
+3. Layout: sidebar izquierdo con navegación + área principal de contenido
+4. Un módulo por sección navegable en el sidebar
+5. Para cada módulo incluir:
+   - Tabla de datos con 5-8 filas de ejemplo realistas para el sector
+   - Buscador y filtros básicos
+   - Botón "Añadir nuevo" con modal funcional
+   - Columna de acciones (editar/ver/eliminar)
+   - KPIs o métricas en la cabecera si aplica
+6. Dashboard principal con:
+   - 4 métricas en cards (las más relevantes del sector)
+   - Lista de actividad reciente
+   - Elemento visual extra (próximas citas, trabajos pendientes, etc.)
+7. Modales de formulario funcionales para añadir/editar registros
+8. Buscador que filtre la tabla en tiempo real
+9. Diseño profesional con tipografía system-ui
+10. Botones de exportar CSV en las tablas principales
+11. Estado visual en filas (activo/pendiente/completado) con badges de colores
+12. Diseño 100% responsive
+13. Todo en español, datos de ejemplo del sector específico y zona Bilbao/Euskadi`;
+
+  setLog('Generando CRM con IA... esto puede tardar 30-50 segundos', 25);
+
+  try{
+    const res=await fetch('/api/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:8000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    setLog('Procesando el CRM...', 70);
+    const data=await res.json();
+    let html=data.content.map(b=>b.text||'').join('');
+    html=html.replace(/```html\n?/gi,'').replace(/```\n?/g,'').trim();
+    if(!html.includes('<!DOCTYPE')){setLog('Error: respuesta sin HTML válido. Intenta de nuevo.',0);btn.disabled=false;return;}
+    generatedHTML=html;
+    setLog('✅ CRM generado. Revisando vista previa...', 90);
+    showPreview(html);
+    document.getElementById('copybtn').disabled=false;
+    document.getElementById('dlbtn').disabled=false;
+    document.getElementById('preview-title').textContent='CRM · '+nombre;
+    setLog(`✅ CRM listo con ${mods.length} módulos. Descarga el HTML para entregarlo al cliente.`, 100);
+  }catch(err){
+    setLog('Error: '+err.message, 0);
+  }
+  btn.disabled=false;
+}
+
+function showPreview(html){
+  const iframe=document.getElementById('preview');
+  document.getElementById('placeholder').style.display='none';
+  iframe.style.display='block';
+  iframe.srcdoc=html;
+}
+function reloadPreview(){if(generatedHTML)showPreview(generatedHTML);}
+function copyCode(){
+  if(!generatedHTML)return;
+  navigator.clipboard.writeText(generatedHTML).then(()=>{
+    const btn=document.getElementById('copybtn');
+    btn.innerHTML='<i class="ti ti-check"></i> Copiado';
+    setTimeout(()=>{btn.innerHTML='<i class="ti ti-copy"></i> Copiar'},2000);
+  });
+}
+function downloadCRM(){
+  if(!generatedHTML)return;
+  const nombre=document.getElementById('nombre').value.trim()||'crm-cliente';
+  const slug=nombre.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  const blob=new Blob([generatedHTML],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='crm-'+slug+'.html';
+  a.click();
+}
+</script>
+</body>
+</html>
