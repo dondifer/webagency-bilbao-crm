@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Agente 1 · Generador de Webs — WebAgency Bilbao</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--acc:#534AB7;--acc2:#3C3489;--bg1:#fff;--bg2:#f8f7f4;--bg3:#f1efe8;--t1:#1a1a18;--t2:#6b6a65;--bd:rgba(0,0,0,0.1);--bd2:rgba(0,0,0,0.18);--r:8px;--rl:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--t1);background:var(--bg3);height:100vh;display:flex;flex-direction:column}
+header{padding:.9rem 1.4rem;background:var(--bg1);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+header h1{font-size:15px;font-weight:600}
+header span{font-size:12px;color:var(--t2)}
+.wrap{flex:1;display:grid;grid-template-columns:380px 1fr;overflow:hidden}
+.panel{border-right:0.5px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow-y:auto}
+.panel-inner{padding:1.2rem;display:flex;flex-direction:column;gap:14px}
+.preview{background:var(--bg1);display:flex;flex-direction:column;overflow:hidden}
+.preview-bar{padding:.7rem 1rem;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
+.preview-bar span{font-size:12px;font-weight:500;color:var(--t2)}
+.preview-content{flex:1;overflow:auto;position:relative}
+iframe{width:100%;height:100%;border:none}
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--t2)}
+.placeholder i{font-size:48px;opacity:.3}
+.placeholder p{font-size:13px}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2);margin-bottom:2px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;color:var(--t2);font-weight:500}
+.field input,.field select,.field textarea{font-size:13px;padding:8px 10px;border-radius:var(--r);border:0.5px solid var(--bd2);background:var(--bg1);color:var(--t1);width:100%;font-family:inherit;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(83,74,183,.12)}
+.field textarea{resize:vertical;min-height:75px}
+.colors{display:flex;gap:8px;flex-wrap:wrap}
+.cchip{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.1s}
+.cchip.sel{border-color:var(--acc);transform:scale(1.15)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);border:0.5px solid var(--bd2);background:transparent;cursor:pointer;font-size:13px;color:var(--t1);transition:.1s;font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btnp{background:var(--acc);color:#fff;border-color:var(--acc);width:100%;justify-content:center;padding:10px}
+.btnp:hover{background:var(--acc2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn i{font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 10px;border-radius:10px;border:0.5px solid var(--bd2);font-size:12px;cursor:pointer;transition:.1s;background:var(--bg1)}
+.chip:hover{border-color:var(--acc);color:var(--acc)}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.log{background:var(--bg1);border:0.5px solid var(--bd);border-radius:var(--r);padding:.9rem;font-size:12px;line-height:1.7;color:var(--t2);min-height:80px;max-height:160px;overflow-y:auto;white-space:pre-wrap}
+.progress{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s}
+.divider{border:none;border-top:0.5px solid var(--bd);margin:4px 0}
+.badge-sector{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600}
+.actions{display:flex;gap:8px}
+.actions .btn{flex:1;justify-content:center;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1><i class="ti ti-world" style="font-size:16px;vertical-align:-2px;margin-right:6px;color:var(--acc)"></i>Agente 1 · Generador de Webs</h1>
+  <span>WebAgency Bilbao · Powered by Claude</span>
+</header>
+<div class="wrap">
+  <!-- PANEL IZQUIERDO - BRIEF -->
+  <div class="panel">
+    <div class="panel-inner">
+      <div class="section-title">Brief del cliente</div>
+
+      <div class="field">
+        <label>Nombre del negocio</label>
+        <input type="text" id="nombre" placeholder="Ej: Clínica Dental Rekalde">
+      </div>
+
+      <div class="field">
+        <label>Sector</label>
+        <select id="sector" onchange="updateSector()">
+          <option value="">Seleccionar sector...</option>
+          <option value="restaurante">🍽️ Restaurante / Bar</option>
+          <option value="clinica">🏥 Clínica / Fisioterapia</option>
+          <option value="dental">🦷 Clínica Dental</option>
+          <option value="taller">🔧 Taller Mecánico</option>
+          <option value="academia">📚 Academia / Clases</option>
+          <option value="instalador">🔌 Instalador / Fontanero</option>
+          <option value="peluqueria">✂️ Peluquería / Estética</option>
+          <option value="hotel">🏡 Hotel Rural / Alojamiento</option>
+          <option value="inmobiliaria">🏠 Inmobiliaria</option>
+          <option value="abogado">⚖️ Abogado / Asesoría</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Zona / Ciudad</label>
+        <input type="text" id="zona" placeholder="Ej: Bilbao, Getxo, Basauri...">
+      </div>
+
+      <div class="field">
+        <label>Servicios principales (separa con comas)</label>
+        <input type="text" id="servicios" placeholder="Ej: Blanqueamiento, Ortodoncia, Implantes">
+      </div>
+
+      <div class="field">
+        <label>Eslogan o mensaje principal</label>
+        <input type="text" id="eslogan" placeholder="Ej: Tu sonrisa, nuestra pasión">
+      </div>
+
+      <div class="field">
+        <label>Teléfono de contacto</label>
+        <input type="text" id="telefono" placeholder="Ej: 944 123 456">
+      </div>
+
+      <div class="field">
+        <label>Llamada a la acción (CTA)</label>
+        <select id="cta">
+          <option value="Pedir cita">Pedir cita</option>
+          <option value="Llamar ahora">Llamar ahora</option>
+          <option value="Solicitar presupuesto">Solicitar presupuesto</option>
+          <option value="Reservar mesa">Reservar mesa</option>
+          <option value="Contactar">Contactar</option>
+          <option value="Ver menú">Ver menú</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Estilo visual</label>
+        <div class="chips" id="chips-estilo">
+          <div class="chip on" onclick="toggleChip(this,'estilo')">Profesional</div>
+          <div class="chip" onclick="toggleChip(this,'estilo')">Moderno</div>
+          <div class="chip" onclick="toggleChip(this,'estilo')">Cálido</div>
+          <div class="chip" onclick="toggleChip(this,'estilo')">Minimalista</div>
+          <div class="chip" onclick="toggleChip(this,'estilo')">Vanguardista</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Color principal</label>
+        <div class="colors" id="color-picker">
+          <div class="cchip sel" style="background:#1a56db" data-color="#1a56db" onclick="pickColor(this)"></div>
+          <div class="cchip" style="background:#0f766e" data-color="#0f766e" onclick="pickColor(this)"></div>
+          <div class="cchip" style="background:#7c3aed" data-color="#7c3aed" onclick="pickColor(this)"></div>
+          <div class="cchip" style="background:#dc2626" data-color="#dc2626" onclick="pickColor(this)"></div>
+          <div class="cchip" style="background:#d97706" data-color="#d97706" onclick="pickColor(this)"></div>
+          <div class="cchip" style="background:#059669" data-color="#059669" onclick="pickColor(this)"></div>
+          <div class="cchip" style="background:#1e293b" data-color="#1e293b" onclick="pickColor(this)"></div>
+          <div class="cchip" style="background:#be185d" data-color="#be185d" onclick="pickColor(this)"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Secciones a incluir</label>
+        <div class="chips" id="chips-sec">
+          <div class="chip on" onclick="toggleChip(this,'sec')">Hero</div>
+          <div class="chip on" onclick="toggleChip(this,'sec')">Servicios</div>
+          <div class="chip on" onclick="toggleChip(this,'sec')">Sobre nosotros</div>
+          <div class="chip on" onclick="toggleChip(this,'sec')">Contacto</div>
+          <div class="chip" onclick="toggleChip(this,'sec')">Testimonios</div>
+          <div class="chip" onclick="toggleChip(this,'sec')">Galería</div>
+          <div class="chip" onclick="toggleChip(this,'sec')">FAQ</div>
+          <div class="chip" onclick="toggleChip(this,'sec')">Blog</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Notas adicionales</label>
+        <textarea id="notas" placeholder="Cualquier detalle específico: referencias, restricciones, peticiones especiales..."></textarea>
+      </div>
+
+      <hr class="divider">
+
+      <div class="log" id="log">Rellena el brief y pulsa Generar para crear la web con IA.</div>
+      <div class="progress"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+
+      <button class="btn btnp" id="genbtn" onclick="generateWeb()">
+        <i class="ti ti-sparkles"></i> Generar web con IA
+      </button>
+
+      <div class="actions">
+        <button class="btn" id="copybtn" onclick="copyCode()" disabled><i class="ti ti-copy"></i> Copiar HTML</button>
+        <button class="btn" id="dlbtn" onclick="downloadWeb()" disabled><i class="ti ti-download"></i> Descargar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW DERECHA -->
+  <div class="preview">
+    <div class="preview-bar">
+      <span id="preview-title">Vista previa</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn" style="padding:4px 8px;font-size:11px" onclick="reloadPreview()"><i class="ti ti-refresh"></i> Recargar</button>
+      </div>
+    </div>
+    <div class="preview-content">
+      <div class="placeholder" id="placeholder">
+        <i class="ti ti-world"></i>
+        <p>La web generada aparecerá aquí</p>
+        <p style="font-size:11px">Rellena el brief y pulsa Generar</p>
+      </div>
+      <iframe id="preview" style="display:none"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+let generatedHTML='';
+let selectedColor='#1a56db';
+let selectedEstilo='Profesional';
+let selectedSections=['Hero','Servicios','Sobre nosotros','Contacto'];
+
+function pickColor(el){
+  document.querySelectorAll('.cchip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedColor=el.dataset.color;
+}
+
+function toggleChip(el,group){
+  if(group==='estilo'){
+    document.querySelectorAll('#chips-estilo .chip').forEach(c=>c.classList.remove('on'));
+    el.classList.add('on');
+    selectedEstilo=el.textContent;
+  } else {
+    el.classList.toggle('on');
+    selectedSections=Array.from(document.querySelectorAll('#chips-sec .chip.on')).map(c=>c.textContent);
+  }
+}
+
+function updateSector(){
+  const s=document.getElementById('sector').value;
+  const ctaMap={restaurante:'Reservar mesa',clinica:'Pedir cita',dental:'Pedir cita',taller:'Solicitar presupuesto',academia:'Matricularse',instalador:'Solicitar presupuesto',peluqueria:'Reservar cita',hotel:'Comprobar disponibilidad',inmobiliaria:'Ver inmuebles',abogado:'Consulta gratuita'};
+  if(ctaMap[s]) document.getElementById('cta').value=ctaMap[s]||'Contactar';
+}
+
+function setLog(msg,p){
+  document.getElementById('log').textContent=msg;
+  document.getElementById('prog').style.width=(p||0)+'%';
+}
+
+async function generateWeb(){
+  const nombre=document.getElementById('nombre').value.trim();
+  const sector=document.getElementById('sector').value;
+  const zona=document.getElementById('zona').value.trim();
+  const servicios=document.getElementById('servicios').value.trim();
+  const eslogan=document.getElementById('eslogan').value.trim();
+  const telefono=document.getElementById('telefono').value.trim();
+  const cta=document.getElementById('cta').value;
+  const notas=document.getElementById('notas').value.trim();
+
+  if(!nombre||!sector){setLog('⚠️ Rellena al menos el nombre y el sector.',0);return;}
+
+  const btn=document.getElementById('genbtn');
+  btn.disabled=true;
+  setLog('Conectando con Claude...', 10);
+
+  const prompt=`Genera una página web profesional completa en HTML, CSS y JavaScript para el siguiente negocio. 
+Devuelve SOLO el código HTML completo, sin explicaciones, sin bloques markdown, sin texto adicional. Empezar directamente con <!DOCTYPE html>.
+
+DATOS DEL NEGOCIO:
+- Nombre: ${nombre}
+- Sector: ${sector}
+- Zona: ${zona||'Bilbao y alrededores'}
+- Servicios: ${servicios||'Servicios profesionales de calidad'}
+- Eslogan: ${eslogan||'Calidad y profesionalidad en cada trabajo'}
+- Teléfono: ${telefono||'944 000 000'}
+- CTA principal: ${cta}
+- Estilo visual: ${selectedEstilo}
+- Color principal: ${selectedColor}
+- Secciones requeridas: ${selectedSections.join(', ')}
+${notas?'- Notas: '+notas:''}
+
+REQUISITOS TÉCNICOS:
+1. HTML5 completo y válido con <!DOCTYPE html>
+2. CSS interno en <style>, moderno y responsive (mobile-first)
+3. Color principal ${selectedColor} y sus variantes para el diseño
+4. Tipografía: Google Fonts (Inter o similar)
+5. Navegación fija con el nombre del negocio y botón CTA
+6. Hero con imagen de fondo (usa unsplash.com con query relacionada al sector) y overlay
+7. Cada sección solicitada bien diseñada con contenido realista
+8. Botón flotante de WhatsApp (wa.me/${telefono.replace(/\s/g,'')})
+9. Formulario de contacto funcional en la sección Contacto
+10. Footer con datos de contacto, horario ficticio y copyright
+11. Meta tags SEO: title, description, og tags
+12. Animaciones CSS suaves en scroll (intersection observer)
+13. Diseño profesional de agencia, NO genérico ni básico
+14. Todo el texto en español, contenido específico al sector ${sector}`;
+
+  setLog('Generando web con IA... (puede tardar 20-40 segundos)', 25);
+
+  try{
+    const res=await fetch('/api/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:6000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    setLog('Procesando respuesta...', 70);
+    const data=await res.json();
+    let html=data.content.map(b=>b.text||'').join('');
+    // Clean up markdown if present
+    html=html.replace(/```html\n?/gi,'').replace(/```\n?/g,'').trim();
+    if(!html.includes('<!DOCTYPE')){setLog('Error: la respuesta no contiene HTML válido.',0);btn.disabled=false;return;}
+    generatedHTML=html;
+    setLog('✅ Web generada correctamente. Cargando vista previa...', 90);
+    showPreview(html);
+    document.getElementById('copybtn').disabled=false;
+    document.getElementById('dlbtn').disabled=false;
+    document.getElementById('preview-title').textContent='Vista previa · '+nombre;
+    setLog('✅ Web lista. Revisa la vista previa. Puedes copiar o descargar el HTML.', 100);
+  }catch(err){
+    setLog('Error de conexión con Claude: '+err.message, 0);
+  }
+  btn.disabled=false;
+}
+
+function showPreview(html){
+  const iframe=document.getElementById('preview');
+  const ph=document.getElementById('placeholder');
+  ph.style.display='none';
+  iframe.style.display='block';
+  iframe.srcdoc=html;
+}
+
+function reloadPreview(){if(generatedHTML)showPreview(generatedHTML);}
+
+function copyCode(){
+  if(!generatedHTML)return;
+  navigator.clipboard.writeText(generatedHTML).then(()=>{
+    const btn=document.getElementById('copybtn');
+    btn.innerHTML='<i class="ti ti-check"></i> Copiado';
+    setTimeout(()=>{btn.innerHTML='<i class="ti ti-copy"></i> Copiar HTML'},2000);
+  });
+}
+
+function downloadWeb(){
+  if(!generatedHTML)return;
+  const nombre=document.getElementById('nombre').value.trim()||'web-cliente';
+  const slug=nombre.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  const blob=new Blob([generatedHTML],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=slug+'.html';
+  a.click();
+}
+</script>
+</body>
+</html>
