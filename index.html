@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebAgency Bilbao · CRM</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--acc:#534AB7;--acc2:#3C3489;--bg1:#fff;--bg2:#f8f7f4;--bg3:#f1efe8;--t1:#1a1a18;--t2:#6b6a65;--bd:rgba(0,0,0,0.1);--bd2:rgba(0,0,0,0.18);--r:8px;--rl:12px;--green:#27500A;--bgreen:#EAF3DE;--amber:#633806;--bamber:#FAEEDA;--blue:#0C447C;--bblue:#E6F1FB;--red:#A32D2D;--bred:#FCEBEB}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--t1);background:var(--bg3);height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+.sidebar{width:212px;flex-shrink:0;border-right:0.5px solid var(--bd);display:flex;flex-direction:column;background:var(--bg2)}
+.logo{padding:.9rem 1.2rem;border-bottom:0.5px solid var(--bd);margin-bottom:4px}
+.logo-title{font-size:14px;font-weight:600}
+.logo-sub{font-size:10px;color:var(--t2);margin-top:1px}
+.logo-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#1D9E75;margin-right:4px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.nav{display:flex;align-items:center;gap:8px;padding:8px 1.2rem;cursor:pointer;color:var(--t2);font-size:12.5px;border-left:2px solid transparent;transition:.1s;user-select:none}
+.nav:hover{background:var(--bg1);color:var(--t1)}
+.nav.on{background:var(--bg1);color:var(--t1);border-left-color:var(--acc);font-weight:500}
+.nav i{font-size:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--acc);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:600}
+.danger-zone{border-top:0.5px solid var(--bd);margin-top:auto;padding-top:4px}
+.nav-danger{color:#A32D2D!important}.nav-danger:hover{background:#FCEBEB!important}
+.main{flex:1;overflow:auto;background:var(--bg3)}
+.topbar{padding:.85rem 1.4rem;border-bottom:0.5px solid var(--bd);background:var(--bg1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.topbar h1{font-size:15px;font-weight:500}
+.pad{padding:1.4rem}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.4rem}
+.mcard{background:var(--bg2);border-radius:var(--r);padding:.9rem}
+.mlabel{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.mval{font-size:24px;font-weight:500}
+.msub{font-size:11px;color:var(--t2);margin-top:3px}
+.mup{color:var(--green)}
+.card{background:var(--bg1);border:0.5px solid var(--bd);border-radius:var(--rl);overflow:hidden;margin-bottom:1.4rem}
+.ch{padding:.8rem 1.2rem;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
+/* PIPELINE DRAG & DROP */
+.pipe-wrap{overflow-x:auto;padding:1.4rem}
+.pipe{display:grid;grid-template-columns:repeat(4,280px);gap:12px;min-width:max-content}
+.pcol{background:var(--bg2);border-radius:var(--rl);padding:.9rem;min-height:400px;border:0.5px solid var(--bd);transition:background .15s}
+.pcol.drag-over{background:#EEEDFE;border-color:#534AB7}
+.phead{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t2);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.pcount{background:var(--bg1);border-radius:10px;padding:1px 7px;font-size:10px;border:0.5px solid var(--bd)}
+.lcard{background:var(--bg1);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;cursor:grab;border:0.5px solid var(--bd);transition:.15s;user-select:none}
+.lcard:hover{border-color:var(--bd2);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.lcard.dragging{opacity:.4;cursor:grabbing}
+.lcard-actions{display:flex;gap:4px;margin-top:8px}
+.ln{font-size:12.5px;font-weight:500}
+.ls{font-size:11px;color:var(--t2);margin-top:2px}
+.lm{display:flex;align-items:center;justify-content:space-between;margin-top:7px}
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{padding:9px 1.2rem;text-align:left;font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;border-bottom:0.5px solid var(--bd);white-space:nowrap}
+td{padding:9px 1.2rem;border-bottom:0.5px solid var(--bd);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
+.bw{background:#EEEDFE;color:#3C3489}.be{background:#E1F5EE;color:#085041}.bc{background:#FAEEDA;color:#633806}
+.st{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap}
+.sa{background:var(--bgreen);color:var(--green)}.se{background:var(--bblue);color:var(--blue)}.sp{background:var(--bamber);color:var(--amber)}
+.av{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0}
+.av1{background:#EEEDFE;color:#3C3489}.av2{background:#E1F5EE;color:#085041}.av3{background:#FAEEDA;color:#633806}.av4{background:#FAECE7;color:#712B13}.av5{background:#E6F1FB;color:#0C447C}
+.cn{display:flex;align-items:center}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r);border:0.5px solid var(--bd2);background:transparent;cursor:pointer;font-size:12px;color:var(--t1);transition:.1s;font-family:inherit;white-space:nowrap}
+.btn:hover{background:var(--bg2)}
+.btnp{background:var(--acc);color:#fff;border-color:var(--acc)}.btnp:hover{background:var(--acc2)}
+.btnd{background:var(--bred);color:var(--red);border-color:var(--red)}.btnd:hover{background:#f7c1c1}
+.btng{background:#E1F5EE;color:#085041;border-color:#5DCAA5}.btng:hover{background:#9FE1CB}
+.btnlink{background:#E6F1FB;color:#0C447C;border-color:#85B7EB}.btnlink:hover{background:#B5D4F4}
+.btn i{font-size:14px}
+/* ACTIVITY */
+.act{display:flex;gap:9px;padding:9px 1.2rem;border-bottom:0.5px solid var(--bd)}
+.act:last-child{border-bottom:none}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.dp{background:var(--acc)}.dt{background:#1D9E75}.da{background:#BA7517}
+.at{font-size:12.5px;line-height:1.5}
+.atime{font-size:11px;color:var(--t2);margin-top:1px}
+.bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:5px}
+.fill{height:100%;border-radius:2px}
+/* CHAT */
+.aichat{display:flex;flex-direction:column;height:calc(100vh - 52px)}
+.msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:82%;padding:9px 14px;border-radius:var(--rl);font-size:13px;line-height:1.65;white-space:pre-wrap}
+.msg.u{background:var(--acc);color:#fff;align-self:flex-end;border-radius:var(--rl) var(--rl) 4px var(--rl)}
+.msg.a{background:var(--bg1);border:0.5px solid var(--bd);align-self:flex-start;border-radius:4px var(--rl) var(--rl) var(--rl)}
+.msg.loading{color:var(--t2);font-style:italic;background:var(--bg2);border:none;align-self:flex-start}
+.msg.err-msg{background:var(--bred);color:var(--red);border-color:var(--red)}
+.ainput{border-top:0.5px solid var(--bd);padding:.9rem 1.2rem;display:flex;gap:8px;background:var(--bg1);flex-shrink:0}
+.ainput textarea{flex:1;border:0.5px solid var(--bd2);border-radius:var(--r);padding:8px 10px;font-size:13px;resize:none;font-family:inherit;outline:none;background:var(--bg2);color:var(--t1);min-height:38px;max-height:120px}
+.ainput textarea:focus{border-color:var(--acc)}
+.quick-btns{padding:.6rem 1.2rem;display:flex;gap:6px;flex-wrap:wrap;background:var(--bg2);border-bottom:0.5px solid var(--bd)}
+.qbtn{padding:4px 10px;border-radius:10px;border:0.5px solid var(--bd2);font-size:11px;cursor:pointer;background:var(--bg1);color:var(--t2);transition:.1s;font-family:inherit}
+.qbtn:hover{border-color:var(--acc);color:var(--acc)}
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:center;justify-content:center}
+.ov.open{display:flex}
+.modal{background:var(--bg1);border-radius:var(--rl);border:0.5px solid var(--bd);width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.mh{padding:.9rem 1.2rem;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500;position:sticky;top:0;background:var(--bg1);z-index:1}
+.mb{padding:1.2rem;display:flex;flex-direction:column;gap:10px}
+.field label{font-size:10px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px}
+.field input,.field select,.field textarea{font-size:13px;padding:7px 9px;border-radius:var(--r);border:0.5px solid var(--bd2);background:var(--bg2);color:var(--t1);width:100%;font-family:inherit;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(83,74,183,.1)}
+.field textarea{resize:vertical;min-height:65px}
+.mf{padding:.9rem 1.2rem;border-top:0.5px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;bottom:0;background:var(--bg1)}
+.mf-right{display:flex;gap:8px}
+/* MISC */
+.page{display:none}.page.on{display:block}
+.loading-overlay{position:fixed;inset:0;background:rgba(248,247,244,.92);z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;font-size:13px;color:var(--t2)}
+.spinner{width:28px;height:28px;border:2.5px solid var(--bd2);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.urow{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:8px 1.2rem;border-bottom:0.5px solid var(--bd)}
+.urow:last-child{border-bottom:none}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1a18;color:#fff;padding:10px 16px;border-radius:var(--r);font-size:13px;z-index:200;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.err{background:var(--red)}
+.empty{padding:2rem;text-align:center;color:var(--t2);font-size:13px}
+.url-tag{font-size:11px;color:var(--blue);font-family:monospace;background:var(--bblue);padding:2px 6px;border-radius:4px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <span id="loading-text">Conectando con la base de datos...</span>
+</div>
+
+<div class="app" style="opacity:0;transition:.3s" id="approot">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-title"><span class="logo-dot"></span>WebAgency Bilbao</div>
+      <div class="logo-sub">CRM · Datos en tiempo real</div>
+    </div>
+    <div class="nav on" onclick="go('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+    <div class="nav" onclick="go('pipeline',this)"><i class="ti ti-git-fork"></i> Pipeline <span class="nav-badge" id="badge-leads">0</span></div>
+    <div class="nav" onclick="go('clientes',this)"><i class="ti ti-users"></i> Clientes</div>
+    <div class="nav" onclick="go('proyectos',this)"><i class="ti ti-file-text"></i> Proyectos</div>
+    <div class="nav" onclick="go('asistente',this)"><i class="ti ti-robot"></i> Asistente IA</div>
+    <div class="nav" onclick="go('facturacion',this)"><i class="ti ti-coin"></i> Facturación</div>
+    <div class="danger-zone">
+      <div class="nav" onclick="cargarDemo()" style="color:#1D9E75"><i class="ti ti-database-import"></i> Cargar demo</div>
+      <div class="nav" onclick="recargar()"><i class="ti ti-refresh"></i> Actualizar datos</div>
+      <div class="nav nav-danger" onclick="borrarTodo()"><i class="ti ti-trash"></i> Borrar todos los datos</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="pg-dashboard" class="page on">
+      <div class="topbar"><h1>Dashboard</h1><button class="btn btnp" onclick="openM('lead',null)"><i class="ti ti-plus"></i> Nuevo lead</button></div>
+      <div class="pad">
+        <div class="grid4">
+          <div class="mcard"><div class="mlabel">MRR recurrente</div><div class="mval" id="m-mrr">—</div><div class="msub mup">Ingresos recurrentes</div></div>
+          <div class="mcard"><div class="mlabel">Clientes activos</div><div class="mval" id="m-clientes">—</div><div class="msub" id="m-clientes-sub">—</div></div>
+          <div class="mcard"><div class="mlabel">Proyectos en curso</div><div class="mval" id="m-proyectos">—</div><div class="msub" id="m-proy-sub">—</div></div>
+          <div class="mcard"><div class="mlabel">Leads activos</div><div class="mval" id="m-leads">—</div><div class="msub" id="m-leads-sub">—</div></div>
+        </div>
+        <div class="two">
+          <div>
+            <div class="card">
+              <div class="ch">Actividad reciente <button class="btn" style="padding:3px 7px;font-size:11px" onclick="recargar()"><i class="ti ti-refresh"></i></button></div>
+              <div id="actividad-list"><div class="empty">Cargando...</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="ch">Objetivos del mes</div>
+              <div style="padding:1.1rem;display:flex;flex-direction:column;gap:14px">
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>MRR objetivo 2.000€</span><span id="obj-mrr-text" style="color:var(--t2)">—</span></div><div class="bar"><div class="fill" id="obj-mrr-bar" style="width:0%;background:var(--acc)"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Clientes objetivo 10</span><span id="obj-cli-text" style="color:var(--t2)">—</span></div><div class="bar"><div class="fill" id="obj-cli-bar" style="width:0%;background:#1D9E75"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Proyectos entregados obj. 8</span><span id="obj-proy-text" style="color:var(--t2)">—</span></div><div class="bar"><div class="fill" id="obj-proy-bar" style="width:0%;background:#BA7517"></div></div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ch">Próximas entregas</div>
+              <div id="entregas-list"><div class="empty">Sin entregas próximas</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIPELINE con drag & drop -->
+    <div id="pg-pipeline" class="page">
+      <div class="topbar"><h1>Pipeline <span style="font-size:11px;color:var(--t2);font-weight:400;margin-left:6px">Arrastra las tarjetas para cambiar el estado</span></h1><button class="btn btnp" onclick="openM('lead',null)"><i class="ti ti-plus"></i> Añadir lead</button></div>
+      <div class="pipe-wrap"><div class="pipe" id="pipeline-board"></div></div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="pg-clientes" class="page">
+      <div class="topbar"><h1>Clientes</h1><button class="btn btnp" onclick="openM('cliente',null)"><i class="ti ti-plus"></i> Nuevo cliente</button></div>
+      <div class="pad">
+        <div class="card">
+          <div class="ch"><span id="clientes-count">Clientes</span>
+            <input type="search" id="buscar-cliente" placeholder="Buscar..." oninput="filtrarClientes()" style="font-size:12px;padding:5px 9px;border-radius:var(--r);border:0.5px solid var(--bd2);background:var(--bg2);color:var(--t1);width:160px;outline:none">
+          </div>
+          <div style="overflow:auto"><table>
+            <thead><tr><th>Cliente</th><th>Sector</th><th>Zona</th><th>Plan</th><th>Estado</th><th>Cuota</th><th>Web</th><th style="text-align:right">Acciones</th></tr></thead>
+            <tbody id="clientes-tbody"><tr><td colspan="8" class="empty">Cargando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROYECTOS -->
+    <div id="pg-proyectos" class="page">
+      <div class="topbar"><h1>Proyectos</h1><button class="btn btnp" onclick="openM('proyecto',null)"><i class="ti ti-plus"></i> Nuevo proyecto</button></div>
+      <div class="pad">
+        <div class="card"><div style="overflow:auto"><table>
+          <thead><tr><th>Proyecto</th><th>Cliente</th><th>Tipo</th><th>Estado</th><th>Precio</th><th>Entrega</th><th style="text-align:right">Acciones</th></tr></thead>
+          <tbody id="proyectos-tbody"><tr><td colspan="7" class="empty">Cargando...</td></tr></tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+    <!-- ASISTENTE IA -->
+    <div id="pg-asistente" class="page">
+      <div class="topbar">
+        <h1>Asistente IA</h1>
+        <span id="ai-status" style="font-size:11px;color:var(--t2)">Conectando con Claude...</span>
+      </div>
+      <div class="aichat">
+        <div class="quick-btns">
+          <button class="qbtn" onclick="quickAsk('¿Cuánto MRR tengo este mes y cómo va respecto al objetivo?')">📊 Resumen MRR</button>
+          <button class="qbtn" onclick="quickAsk('¿Qué leads están en propuesta y qué debería hacer para cerrarlos?')">🎯 Cerrar leads</button>
+          <button class="qbtn" onclick="quickAsk('Redacta un email de seguimiento para el lead más reciente')">✉️ Email seguimiento</button>
+          <button class="qbtn" onclick="quickAsk('¿Qué proyectos tengo que entregar esta semana?')">📅 Entregas próximas</button>
+          <button class="qbtn" onclick="quickAsk('Dame argumentos de venta para un taller mecánico sin web en Basauri')">💬 Argumentos venta</button>
+        </div>
+        <div class="msgs" id="msgs">
+          <div class="msg a">Hola Diego 👋 Soy tu asistente con acceso a los datos reales de la agencia. Puedo ayudarte con propuestas, emails, análisis del pipeline y estrategia de ventas. ¿Qué necesitas?</div>
+        </div>
+        <div class="ainput">
+          <textarea id="inp" placeholder="Pregunta algo sobre tus clientes, leads o proyectos..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="btn btnp" onclick="sendMsg()" style="height:38px;padding:0 14px;flex-shrink:0"><i class="ti ti-send"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FACTURACIÓN -->
+    <div id="pg-facturacion" class="page">
+      <div class="topbar"><h1>Facturación</h1></div>
+      <div class="pad">
+        <div class="grid4">
+          <div class="mcard"><div class="mlabel">Facturado este mes</div><div class="mval" id="f-mes">—</div><div class="msub">Proyectos + cuotas</div></div>
+          <div class="mcard"><div class="mlabel">MRR cuotas</div><div class="mval" id="f-mrr">—</div><div class="msub" id="f-clientes">—</div></div>
+          <div class="mcard"><div class="mlabel">En curso</div><div class="mval" id="f-curso">—</div><div class="msub">Pendientes de cobro</div></div>
+          <div class="mcard"><div class="mlabel">Total clientes</div><div class="mval" id="f-total">—</div><div class="msub">En base de datos</div></div>
+        </div>
+        <div class="card"><div class="ch">Cuotas mensuales activas</div>
+          <div style="overflow:auto"><table>
+            <thead><tr><th>Cliente</th><th>Sector</th><th>Plan</th><th>Cuota/mes</th><th>Estado</th></tr></thead>
+            <tbody id="cuotas-tbody"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LEAD -->
+<div class="ov" id="m-lead">
+  <div class="modal">
+    <div class="mh"><span id="m-lead-title">Nuevo lead</span><button class="btn" style="padding:3px 7px" onclick="closeM('lead')"><i class="ti ti-x"></i></button></div>
+    <div class="mb">
+      <input type="hidden" id="l-id">
+      <div class="field"><label>Empresa *</label><input type="text" id="l-empresa" placeholder="Ej: Taller Mecánico Bilbao"></div>
+      <div class="field"><label>Sector</label><select id="l-sector"><option>Taller mecánico</option><option>Clínica / Fisio</option><option>Clínica Dental</option><option>Restaurante</option><option>Academia</option><option>Instalador</option><option>Peluquería</option><option>Hotel rural</option><option>Otro</option></select></div>
+      <div class="field"><label>Contacto</label><input type="text" id="l-contacto" placeholder="Nombre de la persona"></div>
+      <div class="field"><label>Email</label><input type="email" id="l-email" placeholder="email@negocio.com"></div>
+      <div class="field"><label>Teléfono</label><input type="text" id="l-tel" placeholder="944 000 000"></div>
+      <div class="field"><label>Zona</label><input type="text" id="l-zona" placeholder="Basauri, Getxo, Bilbao..."></div>
+      <div class="field"><label>Producto de interés</label><select id="l-producto"><option>Web Starter (490€)</option><option>Ecosistema Negocio (990€)</option><option>Ecosistema Premium (1.800€)</option></select></div>
+      <div class="field"><label>Estado</label><select id="l-estado"><option value="contacto">Contacto</option><option value="propuesta">Propuesta</option><option value="activo">Activo</option><option value="entregado">Entregado</option></select></div>
+      <div class="field"><label>Origen</label><select id="l-origen"><option>Google Maps</option><option>Instagram</option><option>Referido</option><option>LinkedIn</option><option>Puerta fría</option><option>Otro</option></select></div>
+      <div class="field"><label>Notas</label><textarea id="l-notas" placeholder="Contexto, necesidades detectadas..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btnd" id="l-del-btn" onclick="eliminarRegistro('lead')" style="display:none"><i class="ti ti-trash"></i> Eliminar</button>
+      <div class="mf-right"><button class="btn" onclick="closeM('lead')">Cancelar</button><button class="btn btnp" onclick="guardarLead()"><i class="ti ti-check"></i> Guardar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="ov" id="m-cliente">
+  <div class="modal">
+    <div class="mh"><span id="m-cliente-title">Nuevo cliente</span><button class="btn" style="padding:3px 7px" onclick="closeM('cliente')"><i class="ti ti-x"></i></button></div>
+    <div class="mb">
+      <input type="hidden" id="c-id">
+      <div class="field"><label>Empresa *</label><input type="text" id="c-empresa" placeholder="Nombre del negocio"></div>
+      <div class="field"><label>Sector</label><select id="c-sector"><option>Clínica / Fisioterapia</option><option>Clínica Dental</option><option>Restaurante</option><option>Taller Mecánico</option><option>Academia</option><option>Peluquería / Estética</option><option>Instalador</option><option>Hotel Rural</option><option>Otro</option></select></div>
+      <div class="field"><label>Contacto</label><input type="text" id="c-contacto" placeholder="Nombre responsable"></div>
+      <div class="field"><label>Email</label><input type="email" id="c-email" placeholder="contacto@negocio.com"></div>
+      <div class="field"><label>Teléfono</label><input type="text" id="c-tel" placeholder="+34 600 000 000"></div>
+      <div class="field"><label>Zona</label><input type="text" id="c-zona" placeholder="Getxo, Bilbao, Basauri..."></div>
+      <div class="field"><label>Plan</label><select id="c-plan"><option value="starter">Starter · 39€/mes</option><option value="negocio">Negocio · 69€/mes</option><option value="premium">Premium · 99€/mes</option></select></div>
+      <div class="field"><label>Estado</label><select id="c-estado"><option value="activo">Activo</option><option value="pausado">Pausado</option><option value="baja">Baja</option></select></div>
+      <div class="field"><label>URL de su web entregada</label><input type="url" id="c-url" placeholder="https://cliente.netlify.app"></div>
+      <div class="field"><label>URL de su CRM entregado</label><input type="url" id="c-crm-url" placeholder="https://crm-cliente.netlify.app"></div>
+      <div class="field"><label>Notas</label><textarea id="c-notas" placeholder="Contexto del cliente..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btnd" id="c-del-btn" onclick="eliminarRegistro('cliente')" style="display:none"><i class="ti ti-trash"></i> Eliminar</button>
+      <div class="mf-right"><button class="btn" onclick="closeM('cliente')">Cancelar</button><button class="btn btnp" onclick="guardarCliente()"><i class="ti ti-check"></i> Guardar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROYECTO -->
+<div class="ov" id="m-proyecto">
+  <div class="modal">
+    <div class="mh"><span id="m-proyecto-title">Nuevo proyecto</span><button class="btn" style="padding:3px 7px" onclick="closeM('proyecto')"><i class="ti ti-x"></i></button></div>
+    <div class="mb">
+      <input type="hidden" id="p-id">
+      <div class="field"><label>Nombre del proyecto *</label><input type="text" id="p-nombre" placeholder="Ej: Ecosistema FisioEuskadi"></div>
+      <div class="field"><label>Cliente</label><input type="text" id="p-cliente" placeholder="Nombre del cliente"></div>
+      <div class="field"><label>Tipo</label><select id="p-tipo"><option>Web</option><option>CRM</option><option>Ecosistema</option></select></div>
+      <div class="field"><label>Estado</label><select id="p-estado"><option value="en_curso">En curso</option><option value="entregado">Entregado</option><option value="pausado">Pausado</option></select></div>
+      <div class="field"><label>Precio (€)</label><input type="number" id="p-precio" placeholder="990"></div>
+      <div class="field"><label>Fecha de entrega</label><input type="date" id="p-entrega"></div>
+      <div class="field"><label>Descripción</label><textarea id="p-desc" placeholder="Detalle del proyecto..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btnd" id="p-del-btn" onclick="eliminarRegistro('proyecto')" style="display:none"><i class="ti ti-trash"></i> Eliminar</button>
+      <div class="mf-right"><button class="btn" onclick="closeM('proyecto')">Cancelar</button><button class="btn btnp" onclick="guardarProyecto()"><i class="ti ti-check"></i> Guardar</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://webagency-bilbao-crm.netlify.app';
+let _clientes=[],_proyectos=[],_leads=[],_metricas={};
+let chatHistory=[];
+let dragId=null, dragEstado=null;
+
+// ── NAV ───────────────────────────────────────────────────────
+function go(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  if(el)el.classList.add('on');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openM(id,data){
+  const form=document.getElementById('m-'+id);
+  form.querySelectorAll('input:not([type=hidden]),select,textarea').forEach(el=>el.value='');
+  if(id==='lead'){
+    document.getElementById('m-lead-title').textContent=data?'Editar lead':'Nuevo lead';
+    document.getElementById('l-del-btn').style.display=data?'inline-flex':'none';
+    if(data){['id','empresa','sector','contacto','email','telefono','zona','producto_interes','estado','origen','notas'].forEach(k=>{
+      const el=document.getElementById('l-'+{id:'id',empresa:'empresa',sector:'sector',contacto:'contacto',email:'email',telefono:'tel',zona:'zona',producto_interes:'producto',estado:'estado',origen:'origen',notas:'notas'}[k]);
+      if(el)el.value=data[k]||'';
+    });}
+  }
+  if(id==='cliente'){
+    document.getElementById('m-cliente-title').textContent=data?'Editar cliente':'Nuevo cliente';
+    document.getElementById('c-del-btn').style.display=data?'inline-flex':'none';
+    if(data){
+      ['id','empresa','sector','contacto','email','telefono','zona','plan','estado','url','crm_url','notas'].forEach(k=>{
+        const elId='c-'+{id:'id',empresa:'empresa',sector:'sector',contacto:'contacto',email:'email',telefono:'tel',zona:'zona',plan:'plan',estado:'estado',url:'url',crm_url:'crm-url',notas:'notas'}[k];
+        const el=document.getElementById(elId);
+        if(el)el.value=data[k]||'';
+      });
+    }
+  }
+  if(id==='proyecto'){
+    document.getElementById('m-proyecto-title').textContent=data?'Editar proyecto':'Nuevo proyecto';
+    document.getElementById('p-del-btn').style.display=data?'inline-flex':'none';
+    if(data){
+      document.getElementById('p-id').value=data.id||'';
+      document.getElementById('p-nombre').value=data.nombre||'';
+      document.getElementById('p-cliente').value=data.cliente||'';
+      document.getElementById('p-tipo').value=data.tipo||'Web';
+      document.getElementById('p-estado').value=data.estado||'en_curso';
+      document.getElementById('p-precio').value=data.precio||'';
+      document.getElementById('p-entrega').value=data.fecha_entrega?data.fecha_entrega.substring(0,10):'';
+      document.getElementById('p-desc').value=data.descripcion||'';
+    }
+  }
+  document.getElementById('m-'+id).classList.add('open');
+}
+function closeM(id){document.getElementById('m-'+id).classList.remove('open');}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=(ok?'✓ ':'✗ ')+msg;
+  t.className='toast show'+(ok?'':' err');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── API ───────────────────────────────────────────────────────
+async function apiFetch(endpoint,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const res=await fetch(API+endpoint,opts);
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  return res.json();
+}
+
+// ── LOAD ──────────────────────────────────────────────────────
+async function loadAll(){
+  try{
+    const [c,p,l,m]=await Promise.all([
+      apiFetch('/api/clientes'),apiFetch('/api/proyectos'),
+      apiFetch('/api/leads'),apiFetch('/api/metricas'),
+    ]);
+    _clientes=Array.isArray(c)?c:[];
+    _proyectos=Array.isArray(p)?p:[];
+    _leads=Array.isArray(l)?l:[];
+    _metricas=m||{};
+    renderDashboard();renderPipeline();renderClientes();
+    renderProyectos();renderFacturacion();
+    document.getElementById('badge-leads').textContent=_leads.filter(l=>l.estado!=='entregado').length;
+  }catch(err){toast('Error cargando datos: '+err.message,false);}
+}
+async function recargar(){await loadAll();toast('Datos actualizados');}
+function showLoading(txt){document.getElementById('loading-text').textContent=txt||'Cargando...';document.getElementById('loading').style.display='flex';}
+function hideLoading(){document.getElementById('loading').style.display='none';}
+
+async function cargarDemo(){
+  if(!confirm('¿Cargar datos de demo FisioEuskadi?'))return;
+  showLoading('Cargando demo...');
+  try{const r=await apiFetch('/api/seed-demo','POST');if(r.ok){await loadAll();toast('Demo cargada: '+r.datos.clientes+' clientes, '+r.datos.proyectos+' proyectos');}else toast('Error: '+r.error,false);}
+  catch(e){toast('Error: '+e.message,false);}
+  hideLoading();
+}
+async function borrarTodo(){
+  if(!confirm('⚠️ ¿Borrar TODOS los datos permanentemente?'))return;
+  const c=prompt('Escribe BORRAR para confirmar:');
+  if(c!=='BORRAR'){toast('Cancelado');return;}
+  showLoading('Borrando...');
+  try{const r=await apiFetch('/api/clear-demo','POST');if(r.ok){await loadAll();toast('Datos eliminados');}else toast('Error: '+r.error,false);}
+  catch(e){toast('Error: '+e.message,false);}
+  hideLoading();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function renderDashboard(){
+  const m=_metricas;
+  document.getElementById('m-mrr').textContent=(m.mrr||0)+'€';
+  document.getElementById('m-clientes').textContent=m.clientes_activos||0;
+  document.getElementById('m-clientes-sub').textContent=(m.totales?.clientes||0)+' total registrados';
+  document.getElementById('m-proyectos').textContent=m.proyectos_en_curso||0;
+  document.getElementById('m-proy-sub').textContent=(m.totales?.proyectos||0)+' proyectos total';
+  document.getElementById('m-leads').textContent=m.leads_activos||0;
+  document.getElementById('m-leads-sub').textContent=(m.pipeline?.propuesta||0)+' en propuesta';
+  const mrr=m.mrr||0,cli=m.clientes_activos||0,ent=_proyectos.filter(p=>p.estado==='entregado').length;
+  document.getElementById('obj-mrr-text').textContent=mrr+' / 2.000€';
+  document.getElementById('obj-mrr-bar').style.width=Math.min(100,(mrr/2000)*100)+'%';
+  document.getElementById('obj-cli-text').textContent=cli+' / 10';
+  document.getElementById('obj-cli-bar').style.width=Math.min(100,(cli/10)*100)+'%';
+  document.getElementById('obj-proy-text').textContent=ent+' / 8';
+  document.getElementById('obj-proy-bar').style.width=Math.min(100,(ent/8)*100)+'%';
+  const actEl=document.getElementById('actividad-list');
+  if(!m.actividad?.length){actEl.innerHTML='<div class="empty">Sin actividad. Carga la demo o añade datos.</div>';}
+  else actEl.innerHTML=m.actividad.slice(0,6).map(a=>`<div class="act"><div class="dot ${a.tipo==='cliente'?'dt':a.tipo==='lead'?'dp':'da'}"></div><div><div class="at">${a.texto}</div><div class="atime">${timeAgo(a.fecha)}</div></div></div>`).join('');
+  const prox=_proyectos.filter(p=>p.estado==='en_curso'&&p.fecha_entrega).sort((a,b)=>new Date(a.fecha_entrega)-new Date(b.fecha_entrega)).slice(0,4);
+  document.getElementById('entregas-list').innerHTML=prox.length?prox.map(p=>{
+    const dias=Math.ceil((new Date(p.fecha_entrega)-new Date())/86400000);
+    return`<div class="urow"><span>${p.tipo} · ${p.cliente}</span><span style="font-size:11px;font-weight:600;color:${dias<=2?'#BA7517':'var(--t2)'}">${dias<=0?'Hoy':dias===1?'Mañana':dias+' días'}</span></div>`;
+  }).join(''):'<div class="empty">Sin entregas próximas</div>';
+}
+
+// ── PIPELINE DRAG & DROP ──────────────────────────────────────
+function renderPipeline(){
+  const estados=['contacto','propuesta','activo','entregado'];
+  const labels={contacto:'Contacto',propuesta:'Propuesta',activo:'Activo',entregado:'Entregado'};
+  const colors={contacto:'#534AB7',propuesta:'#BA7517',activo:'#1D9E75',entregado:'#0C447C'};
+  const board=document.getElementById('pipeline-board');
+  board.innerHTML=estados.map(est=>{
+    const items=_leads.filter(l=>l.estado===est);
+    return`<div class="pcol" data-estado="${est}" 
+      ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${est}')">
+      <div class="phead" style="color:${colors[est]}">${labels[est]} <span class="pcount">${items.length}</span></div>
+      ${items.map(l=>leadCard(l)).join('')}
+    </div>`;
+  }).join('');
+}
+
+function leadCard(l){
+  const precio=l.precio_estimado?l.precio_estimado.toLocaleString('es-ES')+'€':'—';
+  const prod=(l.producto_interes||'—').split('(')[0].trim();
+  return`<div class="lcard" draggable="true" data-id="${l.id}"
+    ondragstart="onDragStart(event,'${l.id}','${l.estado}')"
+    ondragend="onDragEnd(event)">
+    <div class="ln">${l.empresa}</div>
+    <div class="ls">${l.sector||''} · ${l.zona||''}</div>
+    <div class="lm">
+      <span class="badge bc">${prod}</span>
+      <span style="font-size:11px;color:var(--t2);font-weight:500">${precio}</span>
+    </div>
+    <div class="lcard-actions">
+      <button class="btn btng" style="padding:2px 7px;font-size:11px;flex:1" onclick='event.stopPropagation();openM("lead",${escJson(l)})'>
+        <i class="ti ti-edit"></i> Editar
+      </button>
+    </div>
+  </div>`;
+}
+
+function escJson(obj){return JSON.stringify(obj).replace(/'/g,"&#39;").replace(/"/g,'&quot;');}
+
+// Drag events
+function onDragStart(e,id,estado){
+  dragId=id; dragEstado=estado;
+  e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>e.target.classList.add('dragging'),0);
+}
+function onDragEnd(e){
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.pcol').forEach(c=>c.classList.remove('drag-over'));
+}
+function onDragOver(e){
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  e.currentTarget.classList.add('drag-over');
+}
+function onDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+async function onDrop(e,nuevoEstado){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!dragId||dragEstado===nuevoEstado)return;
+  try{
+    await apiFetch('/api/leads?id='+dragId,'PUT',{estado:nuevoEstado});
+    toast('Lead movido a '+{contacto:'Contacto',propuesta:'Propuesta',activo:'Activo',entregado:'Entregado'}[nuevoEstado]);
+    await loadAll();
+  }catch(err){toast('Error al mover: '+err.message,false);}
+  dragId=null; dragEstado=null;
+}
+
+// ── CLIENTES ─────────────────────────────────────────────────
+const avColors=['av1','av2','av3','av4','av5'];
+function initials(n){return(n||'??').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+function renderClientes(filtro=''){
+  const lista=filtro?_clientes.filter(c=>(c.empresa+c.sector+c.zona+'').toLowerCase().includes(filtro.toLowerCase())):_clientes;
+  document.getElementById('clientes-count').textContent=lista.length+' cliente'+(lista.length!==1?'s':'');
+  const pL={starter:'Starter',negocio:'Negocio',premium:'Premium'};
+  const pC={starter:'39€',negocio:'69€',premium:'99€'};
+  document.getElementById('clientes-tbody').innerHTML=lista.length?lista.map((c,i)=>`
+    <tr>
+      <td><div class="cn"><div class="av ${avColors[i%5]}">${initials(c.empresa)}</div>${c.empresa}</div></td>
+      <td>${c.sector||'—'}</td><td>${c.zona||'—'}</td>
+      <td><span class="badge be">${pL[c.plan]||c.plan||'—'}</span></td>
+      <td><span class="st sa">${c.estado||'activo'}</span></td>
+      <td><strong>${pC[c.plan]||'—'}</strong></td>
+      <td>
+        ${c.url?`<a href="${c.url}" target="_blank" class="btn btnlink" style="padding:3px 8px;font-size:11px"><i class="ti ti-world"></i> Web</a>`:'<span style="font-size:11px;color:var(--t2)">—</span>'}
+        ${c.crm_url?`<a href="${c.crm_url}" target="_blank" class="btn" style="padding:3px 8px;font-size:11px;margin-left:4px"><i class="ti ti-database"></i> CRM</a>`:''}
+      </td>
+      <td style="text-align:right">
+        <button class="btn btng" style="padding:3px 8px;font-size:11px" onclick='openM("cliente",${escJson(c)})'>
+          <i class="ti ti-edit"></i> Editar
+        </button>
+      </td>
+    </tr>`).join(''):'<tr><td colspan="8" class="empty">No hay clientes. Pulsa "Cargar demo" o añade uno nuevo.</td></tr>';
+}
+function filtrarClientes(){renderClientes(document.getElementById('buscar-cliente').value);}
+
+// ── PROYECTOS ────────────────────────────────────────────────
+function renderProyectos(){
+  const sCls={en_curso:'sa',entregado:'se',pausado:'sp'};
+  const sLbl={en_curso:'En curso',entregado:'Entregado',pausado:'Pausado'};
+  document.getElementById('proyectos-tbody').innerHTML=_proyectos.length?_proyectos.map(p=>{
+    const fecha=p.fecha_entrega?new Date(p.fecha_entrega).toLocaleDateString('es-ES'):'—';
+    const dias=p.fecha_entrega?Math.ceil((new Date(p.fecha_entrega)-new Date())/86400000):null;
+    const urg=dias!==null&&dias<=2&&p.estado==='en_curso';
+    return`<tr>
+      <td><strong>${p.nombre}</strong></td><td>${p.cliente||'—'}</td>
+      <td><span class="badge ${p.tipo==='Web'?'bw':p.tipo==='CRM'?'bc':'be'}">${p.tipo||'—'}</span></td>
+      <td><span class="st ${sCls[p.estado]||'sp'}">${sLbl[p.estado]||p.estado}</span></td>
+      <td>${p.precio?p.precio.toLocaleString('es-ES')+'€':'—'}</td>
+      <td style="color:${urg?'#BA7517':'var(--t2)'};font-weight:${urg?'600':'400'}">${fecha}</td>
+      <td style="text-align:right">
+        <button class="btn btng" style="padding:3px 8px;font-size:11px" onclick='openM("proyecto",${escJson(p)})'>
+          <i class="ti ti-edit"></i> Editar
+        </button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7" class="empty">No hay proyectos aún.</td></tr>';
+}
+
+// ── FACTURACIÓN ──────────────────────────────────────────────
+function renderFacturacion(){
+  const m=_metricas;
+  document.getElementById('f-mes').textContent=(m.facturacion_mes||0).toLocaleString('es-ES')+'€';
+  document.getElementById('f-mrr').textContent=(m.mrr||0)+'€';
+  document.getElementById('f-clientes').textContent=(m.clientes_activos||0)+' clientes activos';
+  document.getElementById('f-curso').textContent=m.proyectos_en_curso||0;
+  document.getElementById('f-total').textContent=m.totales?.clientes||0;
+  const pC={starter:39,negocio:69,premium:99};
+  const pL={starter:'Starter',negocio:'Negocio',premium:'Premium'};
+  document.getElementById('cuotas-tbody').innerHTML=_clientes.filter(c=>c.estado==='activo').map(c=>`
+    <tr><td>${c.empresa}</td><td>${c.sector||'—'}</td><td>${pL[c.plan]||c.plan}</td>
+    <td><strong>${pC[c.plan]||'—'}€</strong></td>
+    <td><span class="st sa">Al día</span></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No hay clientes activos.</td></tr>';
+}
+
+// ── GUARDAR ───────────────────────────────────────────────────
+async function guardarLead(){
+  const empresa=document.getElementById('l-empresa').value.trim();
+  if(!empresa){toast('El nombre es obligatorio',false);return;}
+  const id=document.getElementById('l-id').value;
+  const prod=document.getElementById('l-producto').value;
+  const precio=parseInt((prod.match(/[\d.]+/)||['0'])[0].replace('.',''))||0;
+  const body={empresa,sector:document.getElementById('l-sector').value,contacto:document.getElementById('l-contacto').value,email:document.getElementById('l-email').value,telefono:document.getElementById('l-tel').value,zona:document.getElementById('l-zona').value,producto_interes:prod,precio_estimado:precio,estado:document.getElementById('l-estado').value,origen:document.getElementById('l-origen').value,notas:document.getElementById('l-notas').value};
+  try{
+    if(id)await apiFetch('/api/leads?id='+id,'PUT',body);
+    else await apiFetch('/api/leads','POST',body);
+    closeM('lead');await loadAll();toast(id?'Lead actualizado':'Lead guardado');
+  }catch(e){toast('Error: '+e.message,false);}
+}
+async function guardarCliente(){
+  const empresa=document.getElementById('c-empresa').value.trim();
+  if(!empresa){toast('El nombre es obligatorio',false);return;}
+  const id=document.getElementById('c-id').value;
+  const body={empresa,sector:document.getElementById('c-sector').value,contacto:document.getElementById('c-contacto').value,email:document.getElementById('c-email').value,telefono:document.getElementById('c-tel').value,zona:document.getElementById('c-zona').value,plan:document.getElementById('c-plan').value,estado:document.getElementById('c-estado').value,url:document.getElementById('c-url').value,crm_url:document.getElementById('c-crm-url').value,notas:document.getElementById('c-notas').value,producto:'Ecosistema'};
+  try{
+    if(id)await apiFetch('/api/clientes?id='+id,'PUT',body);
+    else await apiFetch('/api/clientes','POST',body);
+    closeM('cliente');await loadAll();toast(id?'Cliente actualizado':'Cliente creado');
+  }catch(e){toast('Error: '+e.message,false);}
+}
+async function guardarProyecto(){
+  const nombre=document.getElementById('p-nombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio',false);return;}
+  const id=document.getElementById('p-id').value;
+  const fechaVal=document.getElementById('p-entrega').value;
+  const body={nombre,cliente:document.getElementById('p-cliente').value,tipo:document.getElementById('p-tipo').value,estado:document.getElementById('p-estado').value,precio:parseInt(document.getElementById('p-precio').value)||0,fecha_entrega:fechaVal?new Date(fechaVal).toISOString():null,descripcion:document.getElementById('p-desc').value};
+  try{
+    if(id)await apiFetch('/api/proyectos?id='+id,'PUT',body);
+    else await apiFetch('/api/proyectos','POST',body);
+    closeM('proyecto');await loadAll();toast(id?'Proyecto actualizado':'Proyecto creado');
+  }catch(e){toast('Error: '+e.message,false);}
+}
+async function eliminarRegistro(tipo){
+  const id=document.getElementById(tipo[0]+'-id').value;
+  if(!id){toast('Sin ID',false);return;}
+  if(!confirm('¿Eliminar este '+tipo+'? No se puede deshacer.'))return;
+  const ep={lead:'/api/leads',cliente:'/api/clientes',proyecto:'/api/proyectos'};
+  try{await apiFetch(ep[tipo]+'?id='+id,'DELETE');closeM(tipo);await loadAll();toast(tipo.charAt(0).toUpperCase()+tipo.slice(1)+' eliminado');}
+  catch(e){toast('Error: '+e.message,false);}
+}
+
+// ── CHAT IA ───────────────────────────────────────────────────
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+function quickAsk(txt){document.getElementById('inp').value=txt;sendMsg();}
+function addMsg(text,role){
+  const d=document.createElement('div');
+  d.className='msg '+role;d.textContent=text;
+  document.getElementById('msgs').appendChild(d);
+  d.scrollIntoView({block:'end'});return d;
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('inp');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='';
+  addMsg(text,'u');
+  chatHistory.push({role:'user',content:text});
+  const loading=addMsg('Pensando...','a loading');
+
+  // Contexto real inyectado en cada mensaje
+  const ctx=`=== DATOS REALES WebAgency Bilbao (${new Date().toLocaleDateString('es-ES')}) ===
+MRR: ${_metricas.mrr||0}€/mes | Clientes activos: ${_metricas.clientes_activos||0} | Proyectos en curso: ${_metricas.proyectos_en_curso||0} | Leads activos: ${_metricas.leads_activos||0} | Facturación mes: ${_metricas.facturacion_mes||0}€
+Pipeline: ${JSON.stringify(_metricas.pipeline||{})}
+CLIENTES: ${_clientes.map(c=>`${c.empresa} (${c.plan}, ${c.zona}, ${c.sector})`).join(' | ')||'ninguno'}
+PROYECTOS EN CURSO: ${_proyectos.filter(p=>p.estado==='en_curso').map(p=>`${p.nombre} → ${p.cliente}, entrega ${p.fecha_entrega?new Date(p.fecha_entrega).toLocaleDateString('es-ES'):'sin fecha'}`).join(' | ')||'ninguno'}
+LEADS: ${_leads.map(l=>`${l.empresa} [${l.estado}] ${l.zona} - ${l.producto_interes||''}`).join(' | ')||'ninguno'}`;
+
+  // Inyectamos el contexto solo en el primer mensaje del historial de sistema
+  const mensajes=[
+    {role:'user',content:`${ctx}\n\n---\n${text}`},
+    ...chatHistory.slice(1)
+  ];
+
+  try{
+    const res=await fetch('/api/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1024,
+        system:`Eres el asistente interno de WebAgency Bilbao, la agencia de Diego Fernández Hernando que genera webs y CRMs con IA para negocios locales del Gran Bilbao (Bilbao, Getxo, Barakaldo, Basauri, Santurtzi, Erandio, Leioa, Galdakao). 
+
+Tienes acceso completo a los datos reales de la agencia que te llegan en cada mensaje.
+Responde SIEMPRE en español. Sé conciso, directo y práctico.
+Ayudas con: análisis del negocio, propuestas comerciales, emails a clientes y leads, argumentos de venta por sector, estrategia de captación, cálculo de precios y gestión operativa.
+Cuando redactes emails o propuestas, hazlos listos para copiar y enviar.`,
+        messages:mensajes
+      })
+    });
+
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error?.message||'HTTP '+res.status);
+    }
+
+    const data=await res.json();
+    const reply=data.content?.map(b=>b.text||'').join('')||'Sin respuesta';
+    loading.remove();
+    addMsg(reply,'a');
+    chatHistory.push({role:'user',content:text},{role:'assistant',content:reply});
+    // Mantener historial manejable
+    if(chatHistory.length>20)chatHistory=chatHistory.slice(-16);
+
+  }catch(err){
+    loading.remove();
+    const errMsg=addMsg('','a err-msg');
+    if(err.message.includes('401')||err.message.includes('403')){
+      errMsg.textContent='⚠️ Error de autenticación con Claude. Abre este archivo desde claude.ai o Claude Desktop para que la API key esté disponible automáticamente.';
+    } else {
+      errMsg.textContent='Error: '+err.message;
+    }
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function timeAgo(d){
+  const s=(new Date()-new Date(d))/1000;
+  if(s<60)return'Ahora mismo';
+  if(s<3600)return'Hace '+Math.round(s/60)+' min';
+  if(s<86400)return'Hace '+Math.round(s/3600)+'h';
+  if(s<604800)return'Hace '+Math.round(s/86400)+' días';
+  return new Date(d).toLocaleDateString('es-ES');
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+(async()=>{
+  // Verificar conexión con Claude a través del proxy
+  try{
+    const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1,messages:[{role:'user',content:'ping'}]})});
+    const ok=r.ok||r.status===400;
+    document.getElementById('ai-status').textContent=ok?'Claude conectado ✓':'Sin conexión con Claude';
+    document.getElementById('ai-status').style.color=ok?'#1D9E75':'#A32D2D';
+  }catch(e){
+    document.getElementById('ai-status').textContent='Error al conectar con Claude';
+    document.getElementById('ai-status').style.color='#BA7517';
+  }
+  await loadAll();
+  hideLoading();
+  document.getElementById('approot').style.opacity='1';
+})();
+</script>
+</body>
+</html>
