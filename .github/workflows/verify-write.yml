@@ -1,0 +1,31 @@
+name: Verificar y escribir estado CRM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Leer CRM y guardar resultado
+        run: |
+          curl -s "https://webagency-bilbao-crm.netlify.app/api/clientes" > crm-estado.json
+          echo "--- CLIENTES ---"
+          cat crm-estado.json | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          clientes = d if isinstance(d, list) else []
+          print(f'Total: {len(clientes)}')
+          for c in clientes:
+              print(f'  {c.get(\"nombre\",\"?\")} | {c.get(\"plan\",\"?\")} | {c.get(\"zona\",\"?\")} | web: {c.get(\"url_web\",\"—\")}')
+          "
+
+      - name: Commit resultado
+        run: |
+          git config user.email "agent@webagency-bilbao.com"
+          git config user.name "WebAgency Agent"
+          git add crm-estado.json
+          git commit -m "chore: estado CRM $(date +%Y-%m-%d-%H%M)" || echo "Sin cambios"
+          git push
