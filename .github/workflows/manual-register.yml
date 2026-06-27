@@ -1,0 +1,85 @@
+name: Registro manual de cliente
+
+on:
+  workflow_dispatch:
+    inputs:
+      nombre:
+        description: 'Nombre del negocio'
+        required: true
+      sector:
+        description: 'Sector'
+        required: true
+      zona:
+        description: 'Zona'
+        required: true
+      email:
+        description: 'Email'
+        required: true
+      telefono:
+        description: 'Teléfono'
+        required: true
+      plan:
+        description: 'Plan (starter/negocio/premium)'
+        required: true
+        default: 'premium'
+      url_web:
+        description: 'URL web'
+        required: false
+      url_crm:
+        description: 'URL CRM'
+        required: false
+      repo_github:
+        description: 'Repo GitHub'
+        required: false
+      valor:
+        description: 'Valor proyecto €'
+        required: true
+        default: '1800'
+      tipo_proyecto:
+        description: 'Tipo proyecto'
+        required: true
+        default: 'Ecosistema Premium'
+      fecha_entrega:
+        description: 'Fecha entrega YYYY-MM-DD'
+        required: true
+      notas:
+        description: 'Notas'
+        required: false
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Registrar cliente en CRM
+        run: |
+          curl -s -X POST "https://webagency-bilbao-crm.netlify.app/api/onboarding" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"cliente\": {
+                \"nombre\": \"${{ github.event.inputs.nombre }}\",
+                \"sector\": \"${{ github.event.inputs.sector }}\",
+                \"zona\": \"${{ github.event.inputs.zona }}\",
+                \"email\": \"${{ github.event.inputs.email }}\",
+                \"telefono\": \"${{ github.event.inputs.telefono }}\",
+                \"plan\": \"${{ github.event.inputs.plan }}\",
+                \"url_web\": \"${{ github.event.inputs.url_web }}\",
+                \"url_crm\": \"${{ github.event.inputs.url_crm }}\",
+                \"repo_github\": \"${{ github.event.inputs.repo_github }}\",
+                \"notas\": \"${{ github.event.inputs.notas }}\"
+              },
+              \"proyecto\": {
+                \"nombre\": \"${{ github.event.inputs.tipo_proyecto }} ${{ github.event.inputs.nombre }}\",
+                \"tipo\": \"${{ github.event.inputs.tipo_proyecto }}\",
+                \"valor\": ${{ github.event.inputs.valor }},
+                \"fecha_entrega\": \"${{ github.event.inputs.fecha_entrega }}\",
+                \"notas\": \"${{ github.event.inputs.notas }}\"
+              }
+            }" | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          if d.get('ok'):
+              print('✅', d.get('mensaje'))
+          else:
+              print('❌ Error:', d)
+              exit(1)
+          "
