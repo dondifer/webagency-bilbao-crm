@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Agente 4 · Schema Supabase — WebAgency Bilbao</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--acc:#1a7a4a;--acc2:#0f5c37;--bg1:#fff;--bg2:#f8f7f4;--bg3:#f1efe8;--t1:#1a1a18;--t2:#6b6a65;--bd:rgba(0,0,0,0.1);--bd2:rgba(0,0,0,0.18);--r:8px;--rl:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--t1);background:var(--bg3);height:100vh;display:flex;flex-direction:column}
+header{padding:.9rem 1.4rem;background:var(--bg1);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+header h1{font-size:15px;font-weight:600}
+header span{font-size:12px;color:var(--t2)}
+.wrap{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden}
+.panel{border-right:0.5px solid var(--bd);background:var(--bg2);display:flex;flex-direction:column;overflow-y:auto}
+.panel-inner{padding:1.2rem;display:flex;flex-direction:column;gap:12px}
+.output{background:var(--bg1);display:flex;flex-direction:column;overflow:hidden}
+.out-bar{padding:.7rem 1rem;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
+.out-bar span{font-size:12px;font-weight:500;color:var(--t2)}
+.out-content{flex:1;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:1rem}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.field label{font-size:11px;color:var(--t2);font-weight:500;display:block;margin-bottom:4px}
+.field select,.field input{font-size:13px;padding:8px 10px;border-radius:var(--r);border:0.5px solid var(--bd2);background:var(--bg1);color:var(--t1);width:100%;font-family:inherit;outline:none}
+.field select:focus,.field input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(26,122,74,.12)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);border:0.5px solid var(--bd2);background:transparent;cursor:pointer;font-size:13px;color:var(--t1);transition:.1s;font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btnp{background:var(--acc);color:#fff;border-color:var(--acc);width:100%;justify-content:center;padding:10px}
+.btnp:hover{background:var(--acc2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn i{font-size:15px}
+.log{background:var(--bg1);border:0.5px solid var(--bd);border-radius:var(--r);padding:.9rem;font-size:12px;line-height:1.7;color:var(--t2);min-height:60px;white-space:pre-wrap}
+.progress{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s}
+.divider{border:none;border-top:0.5px solid var(--bd);margin:2px 0}
+.actions{display:flex;gap:8px}
+.actions .btn{flex:1;justify-content:center;font-size:12px}
+.code-block{background:#1e1e2e;border-radius:var(--rl);overflow:hidden}
+.code-header{padding:.6rem 1rem;background:#16162a;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#a9b1d6}
+.code-header span{font-family:monospace}
+pre{padding:1rem;font-size:12px;font-family:'Menlo','Monaco','Courier New',monospace;line-height:1.6;overflow-x:auto;color:#a9b1d6;white-space:pre}
+.kw{color:#bb9af7}.str{color:#9ece6a}.cmt{color:#565f89}.fn{color:#7aa2f7}.num{color:#ff9e64}.op{color:#89ddff}
+.table-card{background:var(--bg1);border:0.5px solid var(--bd);border-radius:var(--rl);overflow:hidden}
+.table-card-header{padding:.7rem 1rem;background:var(--bg2);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.table-card-header i{color:var(--acc);font-size:15px}
+.col-list{padding:.8rem 1rem;display:flex;flex-direction:column;gap:6px}
+.col-item{display:flex;align-items:center;gap:8px;font-size:12px}
+.col-name{font-family:monospace;font-weight:600;color:#1a7a4a;min-width:130px}
+.col-type{color:var(--t2);font-size:11px;min-width:90px}
+.col-desc{color:var(--t2);font-size:11px}
+.badge-pk{background:#EEEDFE;color:#3C3489;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700}
+.badge-fk{background:#FAEEDA;color:#633806;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700}
+.badge-req{background:#E1F5EE;color:#085041;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700}
+.placeholder-out{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--t2)}
+.placeholder-out i{font-size:48px;opacity:.3}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 10px;border-radius:10px;border:0.5px solid var(--bd2);font-size:12px;cursor:pointer;background:var(--bg1);transition:.1s}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chip:hover:not(.on){border-color:var(--acc);color:var(--acc)}
+</style>
+</head>
+<body>
+<header>
+  <h1><i class="ti ti-brand-supabase" style="font-size:16px;vertical-align:-2px;margin-right:6px;color:var(--acc)"></i>Agente 4 · Generador de Schema Supabase</h1>
+  <span>WebAgency Bilbao · Base de datos para clientes</span>
+</header>
+<div class="wrap">
+  <div class="panel">
+    <div class="panel-inner">
+      <div class="section-title">Configuración del cliente</div>
+      <div class="field"><label>Nombre del negocio</label><input type="text" id="nombre" placeholder="Ej: Clínica Dental Getxo"></div>
+      <div class="field">
+        <label>Sector</label>
+        <select id="sector">
+          <option value="">Seleccionar...</option>
+          <option value="restaurante">Restaurante / Bar</option>
+          <option value="clinica">Clínica / Fisioterapia</option>
+          <option value="dental">Clínica Dental</option>
+          <option value="taller">Taller Mecánico</option>
+          <option value="academia">Academia / Clases</option>
+          <option value="peluqueria">Peluquería / Estética</option>
+          <option value="instalador">Instalador / Fontanero</option>
+          <option value="hotel">Hotel Rural</option>
+          <option value="inmobiliaria">Inmobiliaria</option>
+        </select>
+      </div>
+
+      <div class="section-title">Opciones de seguridad</div>
+      <div class="chips" id="seg-chips">
+        <div class="chip on" onclick="this.classList.toggle('on')">Row Level Security</div>
+        <div class="chip on" onclick="this.classList.toggle('on')">Timestamps (created_at)</div>
+        <div class="chip on" onclick="this.classList.toggle('on')">Soft delete</div>
+        <div class="chip" onclick="this.classList.toggle('on')">Multi-tenant</div>
+        <div class="chip" onclick="this.classList.toggle('on')">Auditoría completa</div>
+      </div>
+
+      <div class="section-title">Extras</div>
+      <div class="chips" id="ext-chips">
+        <div class="chip on" onclick="this.classList.toggle('on')">Índices optimizados</div>
+        <div class="chip on" onclick="this.classList.toggle('on')">Políticas RLS</div>
+        <div class="chip" onclick="this.classList.toggle('on')">Storage bucket</div>
+        <div class="chip" onclick="this.classList.toggle('on')">Edge functions hints</div>
+        <div class="chip" onclick="this.classList.toggle('on')">Seed data ejemplo</div>
+      </div>
+
+      <div class="field"><label>Requisitos especiales</label><input type="text" id="extra" placeholder="Ej: multiidioma, integración con Stripe..."></div>
+
+      <div class="log" id="log">Selecciona el sector del cliente y pulsa Generar para crear el schema SQL completo para Supabase.</div>
+      <div class="progress"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+
+      <button class="btn btnp" id="genbtn" onclick="generate()"><i class="ti ti-sparkles"></i> Generar schema SQL</button>
+      <div class="actions">
+        <button class="btn" id="copysql" onclick="copySQL()" disabled><i class="ti ti-copy"></i> Copiar SQL</button>
+        <button class="btn" id="dlsql" onclick="downloadSQL()" disabled><i class="ti ti-download"></i> .sql</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="output">
+    <div class="out-bar">
+      <span id="out-title">Schema SQL · Vista previa</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn" style="padding:4px 8px;font-size:11px" id="toggleview" onclick="toggleView()"><i class="ti ti-table"></i> Vista tabla</button>
+      </div>
+    </div>
+    <div class="out-content" id="out-content">
+      <div class="placeholder-out">
+        <i class="ti ti-brand-supabase"></i>
+        <p>El schema SQL aparecerá aquí</p>
+        <p style="font-size:11px">Listo para copiar y pegar en Supabase SQL Editor</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let generatedSQL='';
+let tableData=[];
+let viewMode='sql';
+
+function setLog(msg,p){
+  document.getElementById('log').textContent=msg;
+  document.getElementById('prog').style.width=(p||0)+'%';
+}
+
+async function generate(){
+  const nombre=document.getElementById('nombre').value.trim();
+  const sector=document.getElementById('sector').value;
+  const extra=document.getElementById('extra').value.trim();
+  const segOpts=Array.from(document.querySelectorAll('#seg-chips .chip.on')).map(c=>c.textContent);
+  const extOpts=Array.from(document.querySelectorAll('#ext-chips .chip.on')).map(c=>c.textContent);
+
+  if(!nombre||!sector){setLog('⚠️ Rellena el nombre y el sector.',0);return;}
+
+  const btn=document.getElementById('genbtn');
+  btn.disabled=true;
+  setLog('Conectando con Claude...', 10);
+
+  const prompt=`Genera un schema SQL completo y profesional para Supabase para el siguiente negocio.
+
+NEGOCIO: ${nombre}
+SECTOR: ${sector}
+OPCIONES: ${segOpts.join(', ')}
+EXTRAS: ${extOpts.join(', ')}
+${extra?'REQUISITOS: '+extra:''}
+
+Devuelve SOLO el SQL completo, sin explicaciones, sin markdown, sin texto adicional. Solo el código SQL puro.
+
+El schema debe incluir:
+1. Extensiones necesarias (uuid-ossp, pgcrypto si aplica)
+2. Todas las tablas necesarias para el sector ${sector}, bien relacionadas con FK
+3. Cada tabla con: id (uuid primary key default gen_random_uuid()), ${segOpts.includes('Timestamps (created_at)')?'created_at timestamp default now(), updated_at timestamp default now(),':''} ${segOpts.includes('Soft delete')?'deleted_at timestamp,':''} campos específicos del sector
+4. ${segOpts.includes('Índices optimizados')||extOpts.includes('Índices optimizados')?'Índices en campos de búsqueda frecuente (email, nombre, fecha, estado)':''}
+5. ${segOpts.includes('Row Level Security')?'ALTER TABLE ... ENABLE ROW LEVEL SECURITY para cada tabla':''}
+6. ${segOpts.includes('Políticas RLS')||extOpts.includes('Políticas RLS')?'Políticas RLS básicas: SELECT/INSERT/UPDATE/DELETE para authenticated users':''}
+7. ${extOpts.includes('Seed data ejemplo')?'INSERT INTO con 3-5 filas de datos de ejemplo reales del sector en zona Bilbao/Euskadi':''}
+8. Comentarios SQL (--) explicando cada tabla
+9. Tablas específicas del sector:
+  - restaurante: mesas, reservas, clientes, carta, pedidos, valoraciones
+  - clinica: pacientes, citas, tratamientos, historial, facturas, doctores
+  - dental: pacientes, citas, tratamientos_dentales, presupuestos, facturas, radiografias_meta
+  - taller: clientes, vehiculos, ordenes_trabajo, presupuestos, facturas, repuestos
+  - academia: alumnos, cursos, inscripciones, clases, pagos, asistencia
+  - peluqueria: clientes, citas, servicios, productos, ventas, fidelizacion
+  - instalador: clientes, trabajos, presupuestos, facturas, materiales, agenda
+  - hotel: habitaciones, reservas, huespedes, facturas, servicios_extra, ocupacion
+  - inmobiliaria: inmuebles, clientes, visitas, operaciones, documentos, agentes`;
+
+  setLog('Generando schema SQL...', 30);
+
+  try{
+    const res=await fetch('/api/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:4000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    setLog('Procesando el schema...', 70);
+    const data=await res.json();
+    let sql=data.content.map(b=>b.text||'').join('');
+    sql=sql.replace(/```sql\n?/gi,'').replace(/```\n?/g,'').trim();
+    generatedSQL=sql;
+    renderSQL(sql);
+    document.getElementById('copysql').disabled=false;
+    document.getElementById('dlsql').disabled=false;
+    document.getElementById('out-title').textContent='Schema SQL · '+nombre;
+    setLog('✅ Schema generado. Cópialo y pégalo en el SQL Editor de Supabase.', 100);
+  }catch(err){
+    setLog('Error: '+err.message,0);
+  }
+  btn.disabled=false;
+}
+
+function syntaxHL(sql){
+  return sql
+    .replace(/\b(CREATE|TABLE|INDEX|ON|ALTER|ENABLE|ROW|LEVEL|SECURITY|POLICY|FOR|TO|WITH|CHECK|USING|INSERT|INTO|VALUES|SELECT|UPDATE|DELETE|REFERENCES|DEFAULT|NOT NULL|PRIMARY KEY|UNIQUE|FOREIGN KEY|IF NOT EXISTS|CASCADE|EXTENSION|ENABLE|RESTRICT)\b/gi,'<span class="kw">$1</span>')
+    .replace(/'([^']*)'/g,'<span class="str">\'$1\'</span>')
+    .replace(/--[^\n]*/g,'<span class="cmt">$&</span>')
+    .replace(/\b(uuid|text|varchar|integer|bigint|boolean|timestamp|date|numeric|jsonb|decimal|serial)\b/gi,'<span class="fn">$1</span>')
+    .replace(/\b(\d+)\b/g,'<span class="num">$1</span>');
+}
+
+function renderSQL(sql){
+  const out=document.getElementById('out-content');
+  out.innerHTML=`<div class="code-block"><div class="code-header"><span>SQL — Supabase Editor</span><span style="color:#565f89;font-size:10px">PostgreSQL 15</span></div><pre>${syntaxHL(sql.replace(/</g,'&lt;').replace(/>/g,'&gt;'))}</pre></div>`;
+  viewMode='sql';
+  document.getElementById('toggleview').innerHTML='<i class="ti ti-table"></i> Vista tabla';
+}
+
+function toggleView(){
+  if(viewMode==='sql'){
+    parseTables();
+  } else {
+    renderSQL(generatedSQL);
+  }
+}
+
+function parseTables(){
+  if(!generatedSQL)return;
+  const out=document.getElementById('out-content');
+  const tableRegex=/CREATE TABLE(?:\s+IF NOT EXISTS)?\s+"?(\w+)"?\s*\(([\s\S]*?)\);/gi;
+  let match;const tables=[];
+  while((match=tableRegex.exec(generatedSQL))!==null){
+    const name=match[1];
+    const body=match[2];
+    const cols=body.split(',\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('--')&&!l.startsWith('CONSTRAINT')&&!l.startsWith('FOREIGN')&&!l.startsWith('PRIMARY KEY ('));
+    const parsed=cols.map(col=>{
+      const parts=col.trim().split(/\s+/);
+      const cname=parts[0].replace(/"/g,'');
+      const ctype=parts[1]||'';
+      const isPK=col.toUpperCase().includes('PRIMARY KEY');
+      const isFK=col.toUpperCase().includes('REFERENCES');
+      const isReq=col.toUpperCase().includes('NOT NULL');
+      return{name:cname,type:ctype,pk:isPK,fk:isFK,req:isReq};
+    });
+    tables.push({name,cols:parsed});
+  }
+  if(tables.length===0){renderSQL(generatedSQL);return;}
+  out.innerHTML=tables.map(t=>`
+    <div class="table-card">
+      <div class="table-card-header"><i class="ti ti-table"></i>${t.name} <span style="font-size:11px;color:var(--t2);font-weight:400;margin-left:4px">${t.cols.length} columnas</span></div>
+      <div class="col-list">${t.cols.map(c=>`
+        <div class="col-item">
+          <span class="col-name">${c.name}</span>
+          <span class="col-type">${c.type}</span>
+          ${c.pk?'<span class="badge-pk">PK</span>':''}
+          ${c.fk?'<span class="badge-fk">FK</span>':''}
+          ${c.req&&!c.pk?'<span class="badge-req">REQ</span>':''}
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+  viewMode='table';
+  document.getElementById('toggleview').innerHTML='<i class="ti ti-code"></i> Vista SQL';
+}
+
+function copySQL(){
+  if(!generatedSQL)return;
+  navigator.clipboard.writeText(generatedSQL).then(()=>{
+    const btn=document.getElementById('copysql');
+    btn.innerHTML='<i class="ti ti-check"></i> Copiado';
+    setTimeout(()=>{btn.innerHTML='<i class="ti ti-copy"></i> Copiar SQL'},2000);
+  });
+}
+
+function downloadSQL(){
+  if(!generatedSQL)return;
+  const nombre=document.getElementById('nombre').value.trim()||'cliente';
+  const slug=nombre.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  const blob=new Blob([generatedSQL],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='schema-'+slug+'.sql';
+  a.click();
+}
+</script>
+</body>
+</html>
