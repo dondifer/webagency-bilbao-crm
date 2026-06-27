@@ -1,0 +1,84 @@
+name: Reset y registrar BigTooth limpio
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Paso 1 — Limpiar todos los datos
+        run: |
+          curl -s -X POST "https://webagency-bilbao-crm.netlify.app/api/clear-demo" \
+            -H "Content-Type: application/json" \
+            -d '{}' 
+          echo "Limpieza ejecutada"
+
+      - name: Paso 2 — Esperar 3 segundos
+        run: sleep 3
+
+      - name: Paso 3 — Registrar BigTooth con Python
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, json, sys
+
+          payload = {
+            "cliente": {
+              "nombre": "Clinica BigTooth",
+              "sector": "dental",
+              "zona": "Deusto, Bilbao",
+              "email": "info@bigtooth.es",
+              "telefono": "+34 944 123 456",
+              "plan": "premium",
+              "url_web": "https://clinica-bigtooth.netlify.app",
+              "url_crm": "https://clinica-bigtooth-crm.netlify.app",
+              "repo_github": "https://github.com/dondifer/clinica-bigtooth",
+              "notas": "Ecosistema Premium. Web paleta fria azul-verde, CRM dental, schema Supabase. QA 8.4/10."
+            },
+            "proyecto": {
+              "nombre": "Ecosistema Premium BigTooth",
+              "tipo": "Ecosistema Premium",
+              "valor": 1800,
+              "fecha_entrega": "2025-06-27",
+              "notas": "Web HTML, CRM dental SPA, schema Supabase 7 tablas."
+            }
+          }
+
+          data = json.dumps(payload).encode('utf-8')
+          req = urllib.request.Request(
+            'https://webagency-bilbao-crm.netlify.app/api/onboarding',
+            data=data,
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+          )
+          with urllib.request.urlopen(req) as r:
+            resp = json.loads(r.read().decode('utf-8'))
+            if resp.get('ok'):
+              c = resp.get('cliente', {})
+              p = resp.get('proyecto', {})
+              print("=== REGISTRO EXITOSO ===")
+              print(f"Cliente: {c.get('nombre')}")
+              print(f"ID:      {c.get('id')}")
+              print(f"Plan:    {c.get('plan')}")
+              print(f"Zona:    {c.get('zona')}")
+              print(f"Web:     {c.get('url_web')}")
+              print(f"Proyecto:{p.get('nombre')}")
+              print(f"Valor:   {p.get('valor')}EUR")
+            else:
+              print("ERROR:", resp)
+              sys.exit(1)
+          PYEOF
+
+      - name: Paso 4 — Verificar CRM final
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, json
+
+          with urllib.request.urlopen('https://webagency-bilbao-crm.netlify.app/api/clientes') as r:
+            clientes = json.loads(r.read().decode('utf-8'))
+            if not isinstance(clientes, list):
+              clientes = clientes.get('clientes', [])
+            print(f"=== CRM FINAL: {len(clientes)} cliente(s) ===")
+            for c in clientes:
+              print(f"  - {c.get('nombre')} | {c.get('plan')} | {c.get('zona')} | {c.get('url_web','—')}")
+          PYEOF
